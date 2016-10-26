@@ -1,0 +1,29 @@
+defmodule CloudDrive.Mixfile do
+  use Mix.Project
+
+  def project do
+    [app: :cloud_drive,
+     version: "0.0.1",
+     elixir: "~> 1.2",
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
+     deps: deps]
+  end
+
+  # Configuration for the OTP application
+  def application do
+    [applications: apps(Mix.env),
+     mod: {CloudDrive, []}]
+  end
+
+  defp apps(:prod), do: [:logger, :cowboy, :plug, :amnesia]
+  defp apps(_env), do: apps(:prod) ++ [:remix]
+
+  # Dependencies
+  defp deps do
+    [{:plug, "~> 1.2"},
+     {:remix, "~> 0.0.2"},
+     {:amnesia, "~> 0.2.5"},
+     {:cowboy, "~> 1.0"}]
+  end
+end
