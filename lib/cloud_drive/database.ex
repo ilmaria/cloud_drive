@@ -1,4 +1,5 @@
 use Amnesia
+alias CloudDrive.Hashids, as: H
 
 defdatabase CloudDrive.Database do
   
@@ -16,29 +17,27 @@ defdatabase CloudDrive.Database do
       id:             non_neg_integer,
       name:           String.t,
       tags:           [String.t],
-      mime_type:      String.t
+      mime_type:      String.t,
       creation_time:  DateTime.t,
       modified_time:  DateTime.t,
       owner_id:       non_neg_integer,
       url:            String.t
     }
 
-    @default_values %{
-      tags:           [],
-      mime_type:      :"text/plain"
-      creation_time:  DateTime.utc_now,
-      modified_time:  DateTime.utc_now
-    }
-
     # helper function to access the owning User
+    @spec owner(%File{}) :: %User{}
     def owner(self) do
       User.read(self.owner_id)
     end
-
-    def create(file) do
-      url = "shared/random/" <> file[:name]
-      file |> Map.merge(@default_values)
-           |> Map.merge(%{url: url})
+    
+    def new(file) do
+      Map.merge(%File{
+        tags: [],
+        url: "shared/#{H.encode(file.name)}/#{file.name}",
+        creation_time: DateTime.utc_now,
+        modified_time: DateTime.utc_now
+      }, file)
+    end
   end
-
+  
 end
