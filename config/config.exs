@@ -10,7 +10,7 @@ use Mix.Config
 
 config :cloud_drive, :server,
   host: "localhost",
-  port: 4000,
+  port: 8000,
   scheme: :http
 
 

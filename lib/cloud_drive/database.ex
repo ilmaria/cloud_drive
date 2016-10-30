@@ -30,6 +30,7 @@ defdatabase CloudDrive.Database do
       User.read(self.owner_id)
     end
     
+    @spec new(%File{}) :: %File{}
     def new(file) do
       Map.merge(%File{
         tags: [],
