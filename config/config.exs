@@ -1,23 +1,21 @@
 # This file is responsible for configuring your application
 # and its dependencies with the aid of the Mix.Config module.
-#
-# This configuration file is loaded before any dependency and
-# is restricted to this project.
 use Mix.Config
 
-# Configures the endpoint
-config :cloud_drive, CloudDrive.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "KbY4nOXXIJ64HwdB5z9XGekjNF5lMgh/r+iOyba81XJ3W/NV1ccSMxVCT0eXjj62",
-  render_errors: [view: CloudDrive.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: CloudDrive.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+# This configuration is loaded before any dependency and is restricted
+# to this project. If another project depends on this project, this
+# file won't be loaded nor affect the parent project. For this reason,
+# if you want to provide default values for your application for
+# 3rd-party users, it should be done in your "mix.exs" file.
 
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
+config :cloud_drive, :server,
+  host: "localhost",
+  port: 8000,
+  scheme: :http
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+
+# Configuration from the imported file will override the ones defined
+# here (which is why it is important to import them last).
+
+#import_config "#{Mix.env}.exs"
+import_config "secret.exs"
