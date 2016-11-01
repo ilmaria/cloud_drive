@@ -6,3 +6,5 @@ erl_crash.dump
 config/secret.exs
 /Mnesia*
 /.vscode
+/node_modules
+/web/app-bundle*

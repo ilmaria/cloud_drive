@@ -1,0 +1,25 @@
+{
+  "name": "cloud_drive",
+  "version": "1.0.0",
+  "description": "My CloudDrive",
+  "author": "Ilmari Autio",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "watch": "node ./node_modules/rollup/bin/rollup -w -c",
+    "uglify": "D:/Git/cloud_drive/node_modules/uglify-js/bin/uglifyjs"
+  },
+  "dependencies": {
+    "@cycle/dom": "^14.0.0",
+    "@cycle/xstream-run": "^3.1.0",
+    "xstream": "^7.0.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.36.3",
+    "rollup-plugin-commonjs": "^5.0.5",
+    "rollup-plugin-node-resolve": "^2.0.0",
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-watch": "^2.5.0",
+    "uglify-js": "^2.7.4"
+  }
+}
