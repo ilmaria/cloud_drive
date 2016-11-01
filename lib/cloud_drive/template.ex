@@ -1,27 +1,29 @@
 defmodule CloudDrive.Template do
+  @doc """
+  
+  """
 
-  defmacro __before_compile__(_env) do
+  defmacro __using__(_opts) do
     quote do
+      import CloudDrive.Template
       require EEx
 
       view_path = "./lib/views/"
       files = File.ls!(view_path)
       
-      Enum.map files, fn file ->
-        render_func = file |> String.replace(".", "") |> String.to_atom
-        EEx.function_from_string(:defp,
+      Enum.each files, fn file ->
+        file_name = file |> String.split(".") |> List.first()
+        render_func = "render_" <> file_name |> String.to_atom()
+
+        EEx.function_from_file(:def,
           render_func, view_path <> file, [:assigns])
       end
-    end
-  end
 
-  defmacro __using__(_opts) do
-    quote do
       def render(file, bindings \\ []) do
-        render_func = file |> String.replace(".", "") |> String.to_atom
+        render_func = "render_" <> file |> String.to_atom()
         apply(__MODULE__, render_func, [bindings])
       end
     end
   end
-
+  
 end

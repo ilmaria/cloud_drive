@@ -5,13 +5,13 @@ defmodule CloudDrive.Router do
   plug Plug.Logger
   plug Plug.Static,
     at: "/static",
-    from: {:cloud_drive, "/web/static"}
+    from: "./web"
   
   plug :match
   plug :dispatch
 
   get "/" do
-    send_resp(conn, 200, render("index.html"))
+    send_resp(conn, 200, render("index"))
   end
 
   match _ do
