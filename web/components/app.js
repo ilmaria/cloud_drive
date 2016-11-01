@@ -1,24 +1,20 @@
-import xs from 'xstream';
-import {run} from '@cycle/xstream-run';
-import {makeDOMDriver, div, input, p} from '@cycle/dom';
+import xs from 'xstream'
+import {run} from '@cycle/xstream-run'
+import {makeDOMDriver, h2, div} from '@cycle/dom'
+import SearchBar from './search-bar'
 
-function main(sources) {
-  const sinks = {
-    DOM: sources.DOM.select('input').events('click')
-      .map(ev => ev.target.checked)
-      .startWith(false)
-      .map(toggled =>
-        div([
-          input({attrs: {type: 'checkbox'}}), 'Toggle me',
-          p(toggled ? 'ON' : 'off')
-        ])
-      )
-  };
-  return sinks;
+function App(input) {
+  const searchBar = SearchBar(input)
+  
+  const view$ = searchBar.DOM
+
+  return {
+      DOM: view$
+  }
 }
 
 const drivers = {
   DOM: makeDOMDriver('main')
-};
+}
 
-run(main, drivers);
+run(App, drivers)

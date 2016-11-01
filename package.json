@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@cycle/dom": "^14.0.0",
+    "@cycle/isolate": "^1.4.0",
     "@cycle/xstream-run": "^3.1.0",
     "xstream": "^7.0.0"
   },
@@ -18,7 +19,6 @@
     "rollup": "^0.36.3",
     "rollup-plugin-commonjs": "^5.0.5",
     "rollup-plugin-node-resolve": "^2.0.0",
-    "rollup-plugin-typescript": "^0.8.1",
     "rollup-watch": "^2.5.0",
     "uglify-js": "^2.7.4"
   }
