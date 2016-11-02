@@ -11,6 +11,28 @@
 <link href="/static/css/app.css" rel="stylesheet">
 
 <main>
+
+  <h1>Cloud Drive</h1>
+
+  <section role="search">
+    <input type="search">
+    <button title="Search for tags or file names">Search</button>
+  </section>
+
+  <section id="file-view">
+    <ul id="recent-files">
+      <li>file name</li>
+    </ul>
+    <ul id="all-files">
+      <li>file name</li>
+    </ul>
+    <ul id="search-files" class="display-none">
+    </ul>
+    <template id="file-item-template">
+      <li>file name</li>
+    </template>
+  </section>
+
 </main>
 
-<script src="/static/app-bundle.js"></script>
+<script src="/static/app-bundle.js" defer></script>
