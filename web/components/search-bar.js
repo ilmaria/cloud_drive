@@ -2,7 +2,7 @@ import xs from 'xstream'
 import {section, span, input} from '@cycle/dom'
 import isolate from '@cycle/isolate'
 
-function update(input) {
+function action(input) {
   return input.DOM.select('.search-bar').events('input')
     .map(ev => ev.target.value)
 }
@@ -24,12 +24,12 @@ function view(model$) {
 }
 
 function SearchBar(input) {
-  const update$ = update(input)
-  const model$ = model(update$)
-  const vtree$ = view(model$)
+  const action$ = action(input)
+  const model$ = model(action$)
+  const view$ = view(model$)
 
   return {
-    DOM: vtree$,
+    DOM: view$,
     value: model$
   }
 }
