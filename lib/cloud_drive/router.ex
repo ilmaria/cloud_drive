@@ -1,6 +1,6 @@
 defmodule CloudDrive.Router do
+  alias CloudDrive.View, as: View
   use Plug.Router
-  use CloudDrive.Template
 
   plug Plug.Logger
   plug Plug.Static,
@@ -11,7 +11,7 @@ defmodule CloudDrive.Router do
   plug :dispatch
 
   get "/" do
-    send_resp(conn, 200, render("index"))
+    send_resp(conn, 200, View.Index.render())
   end
 
   match _ do
