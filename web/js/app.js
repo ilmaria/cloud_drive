@@ -1,6 +1,6 @@
-'use strict'
+import { $ } from './utils'
 
-const fileTemplate = document.querySelector('#file-item-template').content
+const fileTemplate = $('#file-item-template').content
 const data = {
   files: [
     {
@@ -33,7 +33,7 @@ const data = {
 }
 
 function updateFileList(files) {
-  const fileList = document.querySelector('#search-files')
+  const fileList = $('#search-files')
 
   for (let file of files) {
     const fileItem = document.importNode(fileTemplate, true)

@@ -6,10 +6,12 @@
   "private": true,
   "license": "MIT",
   "scripts": {
-    "watch": "node ./node_modules/rollup/bin/rollup -w -c",
-    "uglify": "D:/Git/cloud_drive/node_modules/uglify-js/bin/uglifyjs"
+    "iex": "iex.bat -S mix",
+    "rollup": "rollup -w -c",
+    "start": "parallelshell \"npm run iex\" \"npm run rollup\""
   },
   "devDependencies": {
+    "parallelshell": "^2.0.0",
     "rollup": "^0.36.3",
     "rollup-plugin-commonjs": "^5.0.5",
     "rollup-plugin-node-resolve": "^2.0.0",
