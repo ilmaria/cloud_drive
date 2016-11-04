@@ -1,23 +1,30 @@
 use Amnesia
 alias CloudDrive.Hashids, as: H
-alias CloudDrive.Database, as: Db
 
-defdatabase Db do
+defdatabase CloudDrive.Database do
 
-  deftable Db.Tag, [{:id, autoincrement}, :name, :color] do
-    @type t :: %Db.Tag{
+  deftable Tag, [{:id, autoincrement}, :name, :color] do
+    @type t :: %Tag{
       id:       non_neg_integer,
       name:     String.t,
       color:    String.t
     }
   end
+  
+  deftable User, [{:id, autoincrement}, :username, :password] do
+    @type t :: %User{
+      id:         non_neg_integer,
+      username:   String.t,
+      password:   String.t
+    }
+  end
 
-  deftable Db.File, [{:id, autoincrement}, :name, :tags, :mime_type,
+  deftable CloudFile, [{:id, autoincrement}, :name, :tags, :mime_type,
                   :creation_time, :modified_time, :owner_id, :url] do
-    @type t :: %Db.File{
+    @type t :: %CloudFile{
       id:             non_neg_integer,
       name:           String.t,
-      tags:           [Db.Tag.t],
+      tags:           [Tag.t],
       mime_type:      String.t,
       creation_time:  DateTime.t,
       modified_time:  DateTime.t,
@@ -26,22 +33,22 @@ defdatabase Db do
     }
 
     # helper function to access the owning User
-    @spec owner(Db.File.t) :: Db.User.t
+    @spec owner(CloudFile.t) :: User.t
     def owner(self) do
-      Db.User.read(self.owner_id)
+      User.read(self.owner_id)
     end
     
-    @spec save(Db.File.t, Plug.Upload.t) :: Db.File.t
+    @spec save(CloudFile.t, Plug.Upload.t) :: CloudFile.t
     def save(opts, file) do
       # create file first to get auto incremented id
-      cloud_file = Map.merge(%Db.File{
+      cloud_file = Map.merge(%CloudFile{
         tags: [],
         url: "",
         creation_time: DateTime.utc_now,
         modified_time: DateTime.utc_now,
         name: file.filename,
         mime_type: file.content_type
-      }, opts) |> Db.File.write
+      }, opts) |> CloudFile.write
 
       # we use hashed id for file name and shared url
       hash = H.encode(cloud_file.id)
@@ -49,16 +56,8 @@ defdatabase Db do
       File.cp(file.path, "/user_files/#{hash}")
       
       %{cloud_file | url: "/shared/#{hash}/#{file.filename}"}
-        |> Db.File.write
+        |> CloudFile.write
     end
-  end
-
-  deftable Db.User, [{:id, autoincrement}, :username, :password] do
-    @type t :: %Db.User{
-      id:         non_neg_integer,
-      username:   String.t,
-      password:   String.t
-    }
   end
   
 end
