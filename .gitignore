@@ -8,3 +8,4 @@ config/secret.exs
 /.vscode
 /node_modules
 /web/app-bundle*
+/user_files

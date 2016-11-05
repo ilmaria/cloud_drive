@@ -1,15 +1,15 @@
 defmodule CloudDrive.View.Index do
   use Amnesia
   use CloudDrive.Template
-  use CloudDrive.Database
+  use Database
 
   require Logger
 
   def render() do
     result = Amnesia.transaction do
-      CloudFile.first
+      User.first
     end
-    Logger.debug result
+    IO.inspect result
     render_template([])
   end
 end

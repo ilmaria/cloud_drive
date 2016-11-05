@@ -1,7 +1,7 @@
 use Amnesia
 alias CloudDrive.Hashids, as: H
 
-defdatabase CloudDrive.Database do
+defdatabase Database do
 
   deftable Tag, [{:id, autoincrement}, :name, :color] do
     @type t :: %Tag{
@@ -39,21 +39,25 @@ defdatabase CloudDrive.Database do
     end
     
     @spec save(CloudFile.t, Plug.Upload.t) :: CloudFile.t
-    def save(opts, file) do
+    def save(file, tags \\ []) do
       # create file first to get auto incremented id
-      cloud_file = Map.merge(%CloudFile{
-        tags: [],
+      cloud_file = %CloudFile{
+        tags: tags,
         url: "",
         creation_time: DateTime.utc_now,
         modified_time: DateTime.utc_now,
         name: file.filename,
         mime_type: file.content_type
-      }, opts) |> CloudFile.write
+      } |> CloudFile.write
 
+      # root directory for user files
+      root = "user_files/"
+      File.mkdir(root)
+      
       # we use hashed id for file name and shared url
       hash = H.encode(cloud_file.id)
-
-      File.cp(file.path, "/user_files/#{hash}")
+      
+      File.cp(file.path, root <> hash)
       
       %{cloud_file | url: "/shared/#{hash}/#{file.filename}"}
         |> CloudFile.write
