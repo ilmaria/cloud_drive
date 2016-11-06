@@ -1,7 +1,7 @@
 defmodule CloudDrive.View.Index do
   use Amnesia
   use CloudDrive.Template
-  use Database
+  use CloudDrive.Database
 
   require Logger
 

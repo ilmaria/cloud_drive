@@ -25,6 +25,7 @@ defmodule CloudDrive.Mixfile do
      {:remix, "~> 0.0.2"},
      {:amnesia, "~> 0.2.5"},
      {:hashids, "~> 2.0"},
+     {:sizeable, "~> 0.1.5"},
      {:cowboy, "~> 1.0"}]
   end
 end

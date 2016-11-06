@@ -1,7 +1,7 @@
 use Amnesia
 alias CloudDrive.Hashids, as: H
 
-defdatabase Database do
+defdatabase CloudDrive.Database do
 
   deftable Tag, [{:id, autoincrement}, :name, :color] do
     @type t :: %Tag{
@@ -39,9 +39,13 @@ defdatabase Database do
     end
     
     @spec save(CloudFile.t, Plug.Upload.t) :: CloudFile.t
-    def save(file, tags \\ []) do
+    def save(file, opts \\ []) do
+      user = opts |> Keyword.get(:user)
+      tags = opts |> Keyword.get(:tags, [])
+      
       # create file first to get auto incremented id
       cloud_file = %CloudFile{
+        owner_id: user.id,
         tags: tags,
         url: "",
         creation_time: DateTime.utc_now,
