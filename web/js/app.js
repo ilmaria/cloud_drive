@@ -1,4 +1,5 @@
-import { $ } from './utils'
+const $ = document.querySelector.bind(document)
+const $$ = document.querySelectorAll.bind(document)
 
 const fileTemplate = $('#file-item-template').content
 const data = {
