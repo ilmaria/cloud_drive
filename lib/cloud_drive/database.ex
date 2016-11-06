@@ -93,7 +93,7 @@ defdatabase CloudDrive.Database do
       File.cp(file.path, root <> hash)
       
       %{cloud_file | url: "/shared/#{hash}/#{file.filename}"}
-        |> CloudFile.write
+      |> CloudFile.write
     end
   end
   

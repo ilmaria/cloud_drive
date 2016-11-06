@@ -5,7 +5,7 @@ defmodule CloudDrive.View.New do
 
   require Logger
 
-  def render() do
+  def render(_conn) do
     render_template([])
   end
 end

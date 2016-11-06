@@ -1,7 +1,7 @@
 defmodule CloudDrive.Router do
-  alias CloudDrive.View, as: View
-  use Plug.Router
   import CloudDrive.Database.FileUpload
+  use Plug.Router
+  alias CloudDrive.View
   
   if Mix.env == :dev do
     use Plug.Debugger, otp_app: :cloud_drive
@@ -20,12 +20,12 @@ defmodule CloudDrive.Router do
 
   get "/" do
     conn
-    |> send_resp(:ok, View.Index.render)
+    |> send_resp(:ok, View.Index.render(conn))
   end
   
   get "/new" do
     conn
-    |> send_resp(:ok, View.New.render)
+    |> send_resp(:ok, View.New.render(conn))
   end
   
   post "/file-upload" do
@@ -33,7 +33,7 @@ defmodule CloudDrive.Router do
 
     conn
     |> put_message(ok)
-    |> redirect(to: "/new")
+    |> redirect(to: "/")
   end
 
   match _ do
