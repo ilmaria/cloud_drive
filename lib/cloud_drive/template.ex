@@ -5,10 +5,10 @@ defmodule CloudDrive.Template do
       require EEx
 
       view_name = __MODULE__ 
-        |> Atom.to_string
-        |> String.downcase
-        |> String.split(".")
-        |> List.last
+      |> Atom.to_string
+      |> String.downcase
+      |> String.split(".")
+      |> List.last
 
       EEx.function_from_file(
         :defp,

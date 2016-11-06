@@ -13,7 +13,7 @@ defmodule CloudDrive.Database.FileUpload do
       end
 
       file_size = File.stat!(file.path).size
-        |> Sizeable.filesize
+      |> Sizeable.filesize
 
       Logger.info """
       File upload

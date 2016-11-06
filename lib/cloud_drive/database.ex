@@ -32,17 +32,46 @@ defdatabase CloudDrive.Database do
       url:            String.t
     }
 
-    # helper function to access the owning User
+    @doc"""
+    A helper function to access the owning User.
+    """
     @spec owner(CloudFile.t) :: User.t
     def owner(self) do
       User.read(self.owner_id)
     end
+
+    @doc"""
+    Update an existing file on the database.
+    """
+    @spec update(Plug.Upload.t, Keyword.t) :: CloudFile.t
+    def update(file, opts \\ []) do
+      user = opts |> Keyword.get(:user)
+      tags = opts |> Keyword.get(:tags, [])
+
+      matched_files = CloudFile.match(
+        owner_id: user.id,
+        name: file.filename,
+        tags: tags)
+      |> Amnesia.Selection.values
+      
+      case matched_files do
+        [file_to_update] ->
+          file_to_update
+        nil ->
+          {:error, :no_such_file}
+        _ ->
+          raise "Found multiple files with same name and tags"
+      end
+    end
     
-    @spec save(CloudFile.t, Plug.Upload.t) :: CloudFile.t
+    @doc"""
+    Save a new file to the database.
+    """
+    @spec save(Plug.Upload.t, Keyword.t) :: CloudFile.t
     def save(file, opts \\ []) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
-      
+
       # create file first to get auto incremented id
       cloud_file = %CloudFile{
         owner_id: user.id,
