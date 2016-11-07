@@ -1,6 +1,7 @@
 defmodule CloudDrive.Database.FileUpload do
   use Amnesia
   use CloudDrive.Database
+  alias CloudDrive.Database
   require Logger
 
   def save_to_database(conn) do
@@ -8,9 +9,7 @@ defmodule CloudDrive.Database.FileUpload do
     user = conn.assigns[:user]
 
     Enum.each files, fn file ->
-      Amnesia.transaction do
-        CloudFile.save(file, [user: user])
-      end
+      Database.save(CloudFile, file, [user: user])
 
       file_size = File.stat!(file.path).size
       |> Sizeable.filesize

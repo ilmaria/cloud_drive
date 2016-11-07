@@ -4,10 +4,7 @@ defmodule CloudDrive.Template do
     quote do
       require EEx
 
-      view_name = __MODULE__ 
-      |> Atom.to_string
-      |> String.downcase
-      |> String.split(".")
+      view_name = Module.split(__MODULE__) 
       |> List.last
 
       EEx.function_from_file(

@@ -2,22 +2,17 @@ defmodule CloudDrive.View.Index do
   use Amnesia
   use CloudDrive.Template
   use CloudDrive.Database
-  alias Amnesia.Selection
+  alias CloudDrive.Database
 
   require Logger
 
   def render(conn) do
     user = conn.assigns[:user]
 
-    files = Amnesia.transaction do
-      CloudFile.match(
-        owner_id: user.id
-      ) |> Selection.values
-    end
+    files = Database.where CloudFile,
+      owner_id == user.id
 
-    tags = Amnesia.transaction do
-      Tag.where(true) |> Selection.values
-    end
+    tags = Database.all(Tag)
 
     render_template(files: files, tags: tags)
   end

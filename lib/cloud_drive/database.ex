@@ -9,6 +9,10 @@ defdatabase CloudDrive.Database do
       name:     String.t,
       color:    String.t
     }
+
+    def save(tag, _opts) do
+      write(tag)
+    end
   end
   
   deftable User, [{:id, autoincrement}, :username, :password] do
@@ -17,6 +21,10 @@ defdatabase CloudDrive.Database do
       username:   String.t,
       password:   String.t
     }
+
+    def save(user, _opts) do
+      write(user)
+    end
   end
 
   deftable CloudFile, [{:id, autoincrement}, :name, :tags, :mime_type,
@@ -35,7 +43,6 @@ defdatabase CloudDrive.Database do
     @doc"""
     A helper function to access the owning User.
     """
-    @spec owner(CloudFile.t) :: User.t
     def owner(self) do
       User.read(self.owner_id)
     end
@@ -43,7 +50,6 @@ defdatabase CloudDrive.Database do
     @doc"""
     Update an existing file on the database.
     """
-    @spec update(Plug.Upload.t, Keyword.t) :: CloudFile.t
     def update(file, opts \\ []) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
@@ -67,7 +73,6 @@ defdatabase CloudDrive.Database do
     @doc"""
     Save a new file to the database.
     """
-    @spec save(Plug.Upload.t, Keyword.t) :: CloudFile.t
     def save(file, opts \\ []) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
@@ -94,6 +99,38 @@ defdatabase CloudDrive.Database do
       
       %{cloud_file | url: "/shared/#{hash}/#{file.filename}"}
       |> CloudFile.write
+    end
+  end
+
+  defmacro all(table) do
+    quote do
+      Amnesia.transaction do
+        unquote(table).where(true) |> Amnesia.Selection.values
+      end
+    end
+  end
+
+  defmacro where(table, query) do
+    quote do
+      Amnesia.transaction do
+        unquote(table).where(unquote(query)) |> Amnesia.Selection.values
+      end
+    end
+  end
+
+  defmacro match(table, query) do
+    quote do
+      Amnesia.transaction do
+        unquote(table).match(unquote(query)) |> Amnesia.Selection.values
+      end
+    end
+  end
+
+  defmacro save(table, value, opts \\ []) do
+    quote do
+      Amnesia.transaction do
+        unquote(table).save(unquote(value), unquote(opts))
+      end
     end
   end
   
