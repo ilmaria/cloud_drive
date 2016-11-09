@@ -8,3 +8,11 @@ ul {
   padding-left: 0;
   list-style: none;
 }
+
+table {
+  width: 100%;
+}
+
+td {
+  padding-top: 1em;
+}

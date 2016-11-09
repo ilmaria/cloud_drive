@@ -21,27 +21,47 @@
     <button title="Search for tags or file names">Search</button>
   </section>
 
-  <section id="file-view">
+  <section id="file-view" class="self-stretch">
 
     <ul id="recent-files">
       <li>file name</li>
     </ul>
 
-    <ul id="all-files">
-      <%= for file <- @files do %>
-        <li>
-          <span><%= file.name %></span>
-          <span><%= CloudFile.size(file) %></span>
-          <span><%= last_modified_time(file) %></span>
-        </li>
-      <% end %>
-    </ul>
+    <table id="all-files" class="left-align">
+      <thead>
+        <tr>
+          <th>Name
+          <th>File size
+          <th>Last modified
+      <tbody>
+        <%= for file <- @files do %>
+          <tr>
+            <td><%= file.name %>
+            <td><%= CloudFile.size(file) %>
+            <td><%= last_modified_time(file) %>
+        <% end %>
+    </table>
 
-    <ul id="search-files" class="display-none">
-    </ul>
+    <table id="search-files" class="display-none">
+      <thead>
+        <tr>
+          <th>Name
+          <th>File size
+          <th>Last modified
+      <tbody>
+        <%= for file <- @files do %>
+          <tr>
+            <td><%= file.name %>
+            <td><%= CloudFile.size(file) %>
+            <td><%= last_modified_time(file) %>
+        <% end %>
+    </table>
 
     <template id="file-item-template">
-      <li>file name</li>
+      <tr>
+        <td>file name
+        <td>file size
+        <td>last modified
     </template>
     
   </section>
