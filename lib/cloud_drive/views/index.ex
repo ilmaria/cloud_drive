@@ -1,7 +1,8 @@
 defmodule CloudDrive.View.Index do
   use Amnesia
-  use CloudDrive.Template
+  use Timex
   use CloudDrive.Database
+  use CloudDrive.Template
   alias CloudDrive.Database
 
   require Logger
@@ -15,5 +16,13 @@ defmodule CloudDrive.View.Index do
     tags = Database.all(Tag)
 
     render_template(files: files, tags: tags)
+  end
+
+  def last_modified_time(file) do
+    case file.modified_time
+    |> Timex.format("{relative}", :relative) do
+      {:ok, time} -> time
+      {:error, _} -> "-"
+    end
   end
 end

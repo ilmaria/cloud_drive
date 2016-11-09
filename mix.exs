@@ -26,6 +26,7 @@ defmodule CloudDrive.Mixfile do
      {:amnesia, "~> 0.2.5"},
      {:hashids, "~> 2.0"},
      {:sizeable, "~> 0.1.5"},
+     {:timex, "~> 3.1"},
      {:cowboy, "~> 1.0"}]
   end
 end

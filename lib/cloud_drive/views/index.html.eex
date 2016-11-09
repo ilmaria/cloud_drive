@@ -10,31 +10,40 @@
 <link href="/static/css/basscss.css" rel="stylesheet">
 <link href="/static/css/app.css" rel="stylesheet">
 
-<main>
+<main class="flex flex-column items-center">
 
   <h1>Cloud Drive</h1>
 
   <a href="/new">Add files</a>
   
-  <section role="search">
+  <section id="file-search" role="search">
     <input type="search">
     <button title="Search for tags or file names">Search</button>
   </section>
 
   <section id="file-view">
+
     <ul id="recent-files">
       <li>file name</li>
     </ul>
+
     <ul id="all-files">
       <%= for file <- @files do %>
-        <li><%= file.name %></li>
+        <li>
+          <span><%= file.name %></span>
+          <span><%= CloudFile.size(file) %></span>
+          <span><%= last_modified_time(file) %></span>
+        </li>
       <% end %>
     </ul>
+
     <ul id="search-files" class="display-none">
     </ul>
+
     <template id="file-item-template">
       <li>file name</li>
     </template>
+    
   </section>
 
 </main>

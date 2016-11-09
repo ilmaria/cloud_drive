@@ -40,6 +40,9 @@ defdatabase CloudDrive.Database do
       url:            String.t
     }
 
+    @user_files "user_files/"
+    @shared_url "shared"
+
     @doc"""
     A helper function to access the owning User.
     """
@@ -88,17 +91,24 @@ defdatabase CloudDrive.Database do
         mime_type: file.content_type
       } |> CloudFile.write
 
-      # root directory for user files
-      root = "user_files/"
-      File.mkdir(root)
+      File.mkdir(@user_files)
       
       # we use hashed id for file name and shared url
       hash = H.encode(cloud_file.id)
       
-      File.cp(file.path, root <> hash)
+      File.cp(file.path, @user_files <> hash)
       
-      %{cloud_file | url: "/shared/#{hash}/#{file.filename}"}
+      %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
       |> CloudFile.write
+    end
+
+    def size(self) do
+      hash = H.encode(self.id)
+
+      path = Path.join(@user_files, hash)
+
+      File.stat!(path).size
+      |> Sizeable.filesize
     end
   end
 
