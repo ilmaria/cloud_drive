@@ -14,7 +14,7 @@ defdatabase CloudDrive.Database do
       write(tag)
     end
   end
-  
+
   deftable User, [{:id, autoincrement}, :username, :password] do
     @type t :: %User{
       id:         non_neg_integer,
@@ -28,7 +28,7 @@ defdatabase CloudDrive.Database do
   end
 
   deftable CloudFile, [{:id, autoincrement}, :name, :tags, :mime_type,
-                  :creation_time, :modified_time, :owner_id, :url] do
+                  :creation_time, :modified_time, :owner_id, :url, :size] do
     @type t :: %CloudFile{
       id:             non_neg_integer,
       name:           String.t,
@@ -37,7 +37,8 @@ defdatabase CloudDrive.Database do
       creation_time:  DateTime.t,
       modified_time:  DateTime.t,
       owner_id:       non_neg_integer,
-      url:            String.t
+      url:            String.t,
+      size:           non_neg_integer
     }
 
     @user_files "user_files/"
@@ -62,17 +63,14 @@ defdatabase CloudDrive.Database do
         name: file.filename,
         tags: tags)
       |> Amnesia.Selection.values
-      
+
       case matched_files do
-        [file_to_update] ->
-          file_to_update
-        nil ->
-          {:error, :no_such_file}
-        _ ->
-          raise "Found multiple files with same name and tags"
+        [file_to_update] -> file_to_update
+        nil -> {:error, :no_such_file}
+        _ -> raise "Found multiple files with same name and tags"
       end
     end
-    
+
     @doc"""
     Save a new file to the database.
     """
@@ -85,6 +83,7 @@ defdatabase CloudDrive.Database do
         owner_id: user.id,
         tags: tags,
         url: "",
+        size: File.stat!(file.path).size,
         creation_time: DateTime.utc_now,
         modified_time: DateTime.utc_now,
         name: file.filename,
@@ -92,23 +91,14 @@ defdatabase CloudDrive.Database do
       } |> CloudFile.write
 
       File.mkdir(@user_files)
-      
+
       # we use hashed id for file name and shared url
       hash = H.encode(cloud_file.id)
-      
-      File.cp(file.path, @user_files <> hash)
-      
+
+      File.cp!(file.path, @user_files <> hash)
+
       %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
       |> CloudFile.write
-    end
-
-    def size(self) do
-      hash = H.encode(self.id)
-
-      path = Path.join(@user_files, hash)
-
-      File.stat!(path).size
-      |> Sizeable.filesize
     end
   end
 
@@ -143,5 +133,5 @@ defdatabase CloudDrive.Database do
       end
     end
   end
-  
+
 end

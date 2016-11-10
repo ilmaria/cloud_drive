@@ -9,19 +9,16 @@ defmodule CloudDrive.Database.FileUpload do
     user = conn.assigns[:user]
 
     Enum.each files, fn file ->
-      Database.save(CloudFile, file, [user: user])
-
-      file_size = File.stat!(file.path).size
-      |> Sizeable.filesize
+      cloud_file = Database.save(CloudFile, file, [user: user])
 
       Logger.info """
       File upload
       User: #{user.username}
-      File: #{file.filename}
-      Size: #{file_size}\
+      File: #{cloud_file.name}
+      Size: #{cloud_file.size |> Sizeable.filesize}\
       """
     end
-    
+
     :ok
   end
 end

@@ -18,7 +18,7 @@
   <h1>Cloud Drive</h1>
 
   <a href="/new">Add files</a>
-  
+
   <section id="file-search" role="search">
 
     <h3 class="mb0 center">Search</h3>
@@ -47,14 +47,15 @@
           <%= for file <- @files do %>
             <tr>
               <td><%= file.name %>
-              <td><%= CloudFile.size(file) %>
+              <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>
     </section>
 
     <section id="all-files">
-      <h2>All files</h2>
+      <h2 id="all-files-h">All files</h2>
+      <h2 id="search-results-h" class="display-none">Search results</h2>
       <table class="left-align">
         <thead>
           <tr>
@@ -63,26 +64,14 @@
             <th>Last modified
         <tbody>
           <%= for file <- @files do %>
-            <tr>
+            <tr id="<%= "file-id-#{file.id}" %>">
               <td><%= file.name %>
-              <td><%= CloudFile.size(file) %>
+              <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>
     </section>
 
-    <section id="searched-files" class="display-none">
-      <h2>Search results</h2>
-      <table class="left-align">
-        <thead>
-          <tr>
-            <th>Name
-            <th>File size
-            <th>Last modified
-        <tbody>
-      </table>
-    </section>
-    
   </div>
 
 </main>

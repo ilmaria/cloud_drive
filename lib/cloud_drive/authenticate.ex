@@ -11,9 +11,12 @@ defmodule CloudDrive.Authenticate do
 
   def call(conn, _opts) do
     user = Amnesia.transaction do
-      User.first
+      case User.first do
+        nil -> %User{username: "ilmari", password: "ilmari"} |> User.write
+        user -> user
+      end
     end
-    
+
     conn |> assign(:user, user)
   end
 end

@@ -17,8 +17,8 @@ td {
   padding-top: 1em;
 }
 
-h2:not(:first-child) {
-  margin-top: 2em;
+#recent-files {
+  margin-bottom: 3em;
 }
 
 input[type='search'] {
