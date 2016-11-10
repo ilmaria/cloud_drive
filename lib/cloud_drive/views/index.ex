@@ -22,7 +22,9 @@ defmodule CloudDrive.View.Index do
     case file.modified_time
     |> Timex.format("{relative}", :relative) do
       {:ok, time} -> time
-      {:error, _} -> "-"
+      {:error, reason} ->
+        Logger.error reason
+        "-"
     end
   end
 end

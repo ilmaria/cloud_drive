@@ -16,3 +16,13 @@ table {
 td {
   padding-top: 1em;
 }
+
+h2:not(:first-child) {
+  margin-top: 2em;
+}
+
+input[type='search'] {
+  width: 35rem;
+  height: 2.5rem;
+  font-size: 1.4rem;
+}

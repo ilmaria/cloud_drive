@@ -27,6 +27,7 @@ defmodule CloudDrive.Mixfile do
      {:hashids, "~> 2.0"},
      {:sizeable, "~> 0.1.5"},
      {:timex, "~> 3.1"},
+     {:poison, "~> 3.0"},
      {:cowboy, "~> 1.0"}]
   end
 end

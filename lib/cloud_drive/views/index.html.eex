@@ -10,6 +10,9 @@
 <link href="/static/css/basscss.css" rel="stylesheet">
 <link href="/static/css/app.css" rel="stylesheet">
 
+<script src="/static/libs/fuse.min.js" defer></script>
+<script src="/static/js/app.js" defer></script>
+
 <main class="flex flex-column items-center">
 
   <h1>Cloud Drive</h1>
@@ -17,55 +20,73 @@
   <a href="/new">Add files</a>
   
   <section id="file-search" role="search">
-    <input type="search">
-    <button title="Search for tags or file names">Search</button>
+
+    <h3 class="mb0 center">Search</h3>
+
+    <div  class="flex" style="width: 100%">
+      <div style="width: 100%"></div>
+      <div>
+        <input type="search">
+      </div>
+      <div style="width: 100%"></div>
+    </div>
+
   </section>
 
-  <section id="file-view" class="self-stretch">
+  <div class="m3 self-stretch">
 
-    <ul id="recent-files">
-      <li>file name</li>
-    </ul>
-
-    <table id="all-files" class="left-align">
-      <thead>
-        <tr>
-          <th>Name
-          <th>File size
-          <th>Last modified
-      <tbody>
-        <%= for file <- @files do %>
+    <section id="recent-files">
+      <h2>Recent files</h2>
+      <table class="left-align">
+        <thead>
           <tr>
-            <td><%= file.name %>
-            <td><%= CloudFile.size(file) %>
-            <td><%= last_modified_time(file) %>
-        <% end %>
-    </table>
+            <th>Name
+            <th>File size
+            <th>Last modified
+        <tbody>
+          <%= for file <- @files do %>
+            <tr>
+              <td><%= file.name %>
+              <td><%= CloudFile.size(file) %>
+              <td><%= last_modified_time(file) %>
+          <% end %>
+      </table>
+    </section>
 
-    <table id="search-files" class="display-none">
-      <thead>
-        <tr>
-          <th>Name
-          <th>File size
-          <th>Last modified
-      <tbody>
-        <%= for file <- @files do %>
+    <section id="all-files">
+      <h2>All files</h2>
+      <table class="left-align">
+        <thead>
           <tr>
-            <td><%= file.name %>
-            <td><%= CloudFile.size(file) %>
-            <td><%= last_modified_time(file) %>
-        <% end %>
-    </table>
+            <th>Name
+            <th>File size
+            <th>Last modified
+        <tbody>
+          <%= for file <- @files do %>
+            <tr>
+              <td><%= file.name %>
+              <td><%= CloudFile.size(file) %>
+              <td><%= last_modified_time(file) %>
+          <% end %>
+      </table>
+    </section>
 
-    <template id="file-item-template">
-      <tr>
-        <td>file name
-        <td>file size
-        <td>last modified
-    </template>
+    <section id="searched-files" class="display-none">
+      <h2>Search results</h2>
+      <table class="left-align">
+        <thead>
+          <tr>
+            <th>Name
+            <th>File size
+            <th>Last modified
+        <tbody>
+      </table>
+    </section>
     
-  </section>
+  </div>
 
 </main>
 
-<script src="/static/js/app.js" defer></script>
+<script>
+  var FILE_LIST = <%= Poison.encode!(@files) %>
+</script>
