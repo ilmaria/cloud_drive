@@ -21,6 +21,10 @@ td {
   margin-bottom: 3em;
 }
 
+.selected {
+  background-color: #eee;
+}
+
 input[type='search'] {
   width: 35rem;
   height: 2.5rem;
