@@ -11,6 +11,11 @@ ul {
 
 table {
   width: 100%;
+  border-spacing: 0;
+}
+
+tbody > tr:hover {
+  background-color: #f6f6f6;
 }
 
 td {
@@ -23,6 +28,10 @@ td {
 
 .selected {
   background-color: #eee;
+}
+
+.selected:hover {
+  background-color: #eaeaea;
 }
 
 input[type='search'] {

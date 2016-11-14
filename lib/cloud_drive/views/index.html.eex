@@ -17,7 +17,10 @@
 
   <h1>Cloud Drive</h1>
 
-  <a href="/new">Add files</a>
+  <nav>
+    <a href="/new">Add files</a> |
+    <a href="javascript:void(0)" onclick="deleteSelectedFiles()">Delete file</a>
+  </nav>
 
   <section id="file-search" role="search">
 
@@ -77,5 +80,5 @@
 </main>
 
 <script>
-  var FILE_LIST = <%= Poison.encode!(@files) %>
+  const FILE_LIST = <%= Poison.encode!(@files) %>
 </script>

@@ -1,10 +1,12 @@
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
-const files = FILE_LIST
-const fuse = new Fuse(files, {
+//const = FILE_LIST // this is declared inline in index.html
+
+const fuse = new Fuse(FILE_LIST, {
   keys: ['name', 'tags']
 })
+let selectedFiles = []
 
 $('input[type="search"]').addEventListener('input', event => {
   const string = event.target.value
@@ -22,7 +24,20 @@ for (const row of tableRows) {
     }
     // mark current row as selected
     row.classList.add('selected')
+
+    selectedFiles.push(elemIdToFileId(row.id))
   })
+}
+
+function deleteSelectedFiles() {
+  const filesToRemove = FILE_LIST
+    .filter(file => selectedFiles.includes(file.id))
+
+  deleteFromDatabase(filesToRemove)
+}
+
+function deleteFromDatabase(files) {
+
 }
 
 function showSearchResults(files, show) {
@@ -34,7 +49,7 @@ function showSearchResults(files, show) {
   const tableRows = $$('#all-files tbody tr')
 
   for (const row of tableRows) {
-    const fileId = Number(row.id.split('-')[2])
+    const fileId = elemIdToFileId(row.id)
     const inFileResults = files.find(x => x.id === fileId)
 
     if (show) {
@@ -43,4 +58,8 @@ function showSearchResults(files, show) {
       row.classList.remove('display-none')
     }
   }
+}
+
+function elemIdToFileId(elemId) {
+  return Number(elemId.split('-')[2])
 }
