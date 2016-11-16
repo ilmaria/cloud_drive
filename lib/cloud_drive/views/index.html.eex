@@ -7,12 +7,16 @@
 
 <title>CloudDrive</title>
 
+<!-- styles -->
 <link href="/static/css/basscss.css" rel="stylesheet">
 <link href="/static/css/app.css" rel="stylesheet">
 
+<!-- scripts -->
 <script src="/static/libs/fuse.min.js" defer></script>
+<script src="/static/libs/axios.min.js" defer></script>
 <script src="/static/js/app.js" defer></script>
 
+<!-- body -->
 <main class="flex flex-column items-center">
 
   <h1>Cloud Drive</h1>
@@ -22,6 +26,7 @@
     <a href="javascript:void(0)" onclick="deleteSelectedFiles()">Delete file</a>
   </nav>
 
+  <!-- search bar -->
   <section id="file-search" role="search">
 
     <h3 class="mb0 center">Search</h3>
@@ -36,8 +41,10 @@
 
   </section>
 
+  <!-- file view -->
   <div class="m3 self-stretch">
 
+    <!-- recent files -->
     <section id="recent-files">
       <h2>Recent files</h2>
       <table class="left-align">
@@ -48,7 +55,7 @@
             <th>Last modified
         <tbody>
           <%= for file <- @files do %>
-            <tr>
+            <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
               <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
               <td><%= last_modified_time(file) %>
@@ -56,6 +63,7 @@
       </table>
     </section>
 
+    <!-- all files -->
     <section id="all-files">
       <h2 id="all-files-h">All files</h2>
       <h2 id="search-results-h" class="display-none">Search results</h2>
@@ -67,7 +75,7 @@
             <th>Last modified
         <tbody>
           <%= for file <- @files do %>
-            <tr id="<%= "file-id-#{file.id}" %>">
+            <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
               <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
               <td><%= last_modified_time(file) %>
