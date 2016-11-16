@@ -100,6 +100,12 @@ defdatabase CloudDrive.Database do
       %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
       |> CloudFile.write
     end
+
+    def remove(fileId) do
+      File.rm!(@user_files <> H.encode(fileId))
+
+      CloudFile.delete(fileId)
+    end
   end
 
   defmacro all(table) do
@@ -130,6 +136,14 @@ defdatabase CloudDrive.Database do
     quote do
       Amnesia.transaction do
         unquote(table).save(unquote(value), unquote(opts))
+      end
+    end
+  end
+
+  defmacro remove(table, item) do
+    quote do
+      Amnesia.transaction do
+        unquote(table).remove(unquote(item))
       end
     end
   end

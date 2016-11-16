@@ -24,20 +24,24 @@ for (const row of tableRows) {
     }
     // mark current row as selected
     row.classList.add('selected')
-
+    selectedFiles = []
     selectedFiles.push(elemIdToFileId(row.id))
   })
 }
 
 function deleteSelectedFiles() {
-  const filesToRemove = FILE_LIST
-    .filter(file => selectedFiles.includes(file.id))
+  axios.post('/file-remove', {
+    fileIds: selectedFiles
+  })
+  .then(resp => {
+    const removedFiles = FILE_LIST
+      .filter(file => selectedFiles.includes(file.id))
 
-  deleteFromDatabase(filesToRemove)
-}
-
-function deleteFromDatabase(files) {
-
+    console.log('Removed files:', removedFiles)
+  })
+  .catch(err => {
+    console.error(err)
+  })
 }
 
 function showSearchResults(files, show) {

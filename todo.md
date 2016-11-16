@@ -6,4 +6,6 @@
   - select multiple files
   - double click to open preview
 * removing selected files
+  - ~~deleting selected file~~
+  - refresh page when file is deleted
 * google drive integration
