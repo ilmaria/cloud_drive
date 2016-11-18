@@ -9,3 +9,5 @@
   - ~~deleting selected file~~
   - refresh page when file is deleted
 * google drive integration
+* visuals
+  - <http://imgur.com/gallery/VqrRH>
