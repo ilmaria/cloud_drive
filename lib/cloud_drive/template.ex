@@ -6,6 +6,7 @@ defmodule CloudDrive.Template do
 
       view_name = Module.split(__MODULE__) 
       |> List.last
+      |> String.downcase
 
       EEx.function_from_file(
         :defp,

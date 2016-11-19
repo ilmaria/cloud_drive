@@ -1,3 +1,4 @@
+'use strict'
 const $ = document.querySelector.bind(document)
 const $$ = document.querySelectorAll.bind(document)
 
@@ -16,10 +17,10 @@ $('input[type="search"]').addEventListener('input', event => {
 
 const tableRows = $$('tbody tr')
 
-for (const row of tableRows) {
+tableRows.forEach(row => {
   row.addEventListener('click', event => {
     // remove old selected classes
-    for (const i of tableRows) {
+    for (let i of tableRows) {
       i.classList.remove('selected')
     }
     // mark current row as selected
@@ -27,17 +28,14 @@ for (const row of tableRows) {
     selectedFiles = []
     selectedFiles.push(elemIdToFileId(row.id))
   })
-}
+})
 
 function deleteSelectedFiles() {
   axios.post('/file-remove', {
     fileIds: selectedFiles
   })
   .then(resp => {
-    const removedFiles = FILE_LIST
-      .filter(file => selectedFiles.includes(file.id))
-
-    console.log('Removed files:', removedFiles)
+    location.reload()
   })
   .catch(err => {
     console.error(err)
@@ -52,7 +50,7 @@ function showSearchResults(files, show) {
 
   const tableRows = $$('#all-files tbody tr')
 
-  for (const row of tableRows) {
+  for (let row of tableRows) {
     const fileId = elemIdToFileId(row.id)
     const inFileResults = files.find(x => x.id === fileId)
 
