@@ -4,7 +4,7 @@ defmodule CloudDrive.Router do
   use CloudDrive.Database
   alias CloudDrive.{Database, View}
   require Logger
-  
+
   if Mix.env == :dev do
     use Plug.Debugger, otp_app: :cloud_drive
   end
@@ -25,12 +25,12 @@ defmodule CloudDrive.Router do
     conn
     |> send_resp(:ok, View.Index.render(conn))
   end
-  
+
   get "/new" do
     conn
     |> send_resp(:ok, View.New.render(conn))
   end
-  
+
   post "/file-upload" do
     files = conn.params["files"]
     user = conn.assigns[:user]
