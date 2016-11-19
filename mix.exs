@@ -28,6 +28,8 @@ defmodule CloudDrive.Mixfile do
      {:sizeable, "~> 0.1.5"},
      {:timex, "~> 3.1"},
      {:poison, "~> 3.0"},
+     {:ueberauth, "~> 0.4"},
+     {:ueberauth_google, "~> 0.4"},
      {:cowboy, "~> 1.0"}]
   end
 end

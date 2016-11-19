@@ -13,6 +13,10 @@ config :cloud_drive, :server,
   port: 8000,
   scheme: :http
 
+config :ueberauth, Ueberauth,
+  providers: [
+    google: {Ueberauth.Strategy.Google, []}
+  ]
 
 # Configuration from the imported file will override the ones defined
 # here (which is why it is important to import them last).
