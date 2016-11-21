@@ -16,7 +16,8 @@ defmodule CloudDrive.Mixfile do
      mod: {CloudDrive, []}]
   end
 
-  defp apps(:prod), do: [:logger, :cowboy, :plug, :amnesia]
+  defp apps(:prod), do: [:logger, :cowboy, :plug, :amnesia,
+    :ueberauth_google]
   defp apps(_env), do: apps(:prod) ++ [:remix]
 
   # Dependencies
@@ -27,7 +28,7 @@ defmodule CloudDrive.Mixfile do
      {:hashids, "~> 2.0"},
      {:sizeable, "~> 0.1.5"},
      {:timex, "~> 3.1"},
-     {:poison, "~> 3.0"},
+     {:poison, "~> 3.0", override: true},
      {:ueberauth, "~> 0.4"},
      {:ueberauth_google, "~> 0.4"},
      {:cowboy, "~> 1.0"}]

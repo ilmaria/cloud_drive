@@ -18,6 +18,17 @@ defmodule CloudDrive.Router do
     parsers: [:multipart, :json],
     pass: ["*/*"],
     json_decoder: Poison
+
+  plug Plug.Session,
+    store: :cookie,
+    key: "_cloud_drive_session",
+    encryption_salt: "cookie store encryption salt",
+    signing_salt: "cookie store signing salt",
+    key_length: 64,
+    log: :debug
+
+  plug :fetch_session
+
   plug :match
   plug :dispatch
 
@@ -29,6 +40,23 @@ defmodule CloudDrive.Router do
   get "/new" do
     conn
     |> send_resp(:ok, View.New.render(conn))
+  end
+
+  get "/auth/google" do
+    conn
+    |> send_resp(:ok, View.Login.render(conn))
+  end
+
+  get "/auth/google/callback" do
+
+  end
+
+  post "/auth/google/callback" do
+
+  end
+
+  delete "/logout" do
+
   end
 
   post "/file-upload" do

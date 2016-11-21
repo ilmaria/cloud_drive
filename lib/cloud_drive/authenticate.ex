@@ -1,13 +1,12 @@
 defmodule CloudDrive.Authenticate do
   use Amnesia
   use CloudDrive.Database
-  import Plug.Conn
+  use Plug.Builder
 
-  @behaviour Plug
+  @secret Application.get_env(:cloud_drive, :secret)
 
-  def init(opts) do
-    opts
-  end
+  plug :put_secret_key_base
+  plug Ueberauth
 
   def call(conn, _opts) do
     user = Amnesia.transaction do
@@ -18,5 +17,9 @@ defmodule CloudDrive.Authenticate do
     end
 
     conn |> assign(:user, user)
+  end
+
+  def put_secret_key_base(conn, _) do
+    put_in conn.secret_key_base, @secret[:secret_key_base]
   end
 end
