@@ -31,7 +31,7 @@ tableRows.forEach(row => {
 })
 
 function deleteSelectedFiles() {
-  axios.post('/file-remove', {
+  axios.post('/file/remove', {
     fileIds: selectedFiles
   })
   .then(resp => {

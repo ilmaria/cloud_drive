@@ -9,7 +9,8 @@
 
 ## removing selected files
   - [x] deleting selected file
-  - [ ] refresh page when file is deleted
+  - [x] refresh page when file is deleted
+  - [ ] make files removable from "recent files" list
 
 ## google drive integration
 

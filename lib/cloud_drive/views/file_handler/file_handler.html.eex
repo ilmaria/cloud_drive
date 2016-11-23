@@ -16,11 +16,9 @@
 
   <a href="/">Home page</a>
 
-  <form method="post" action="file-upload" name="submit" enctype="multipart/form-data">
+  <form method="post" action="upload" name="submit" enctype="multipart/form-data">
     <input type="file" name="files[]" multiple>
     <button type="submit" name="submit">Submit</button>
   </form>
 
 </main>
-
-<script src="/static/app-bundle.js" defer></script>
