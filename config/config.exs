@@ -15,7 +15,7 @@ config :cloud_drive, :server,
 
 config :ueberauth, Ueberauth,
   providers: [
-    google: {Ueberauth.Strategy.Google, [default_scope: "drive.readonly"]}
+    google: {Ueberauth.Strategy.Google, []}
   ]
 
 # Configuration from the imported file will override the ones defined

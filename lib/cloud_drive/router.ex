@@ -9,11 +9,15 @@ defmodule CloudDrive.Router do
     use Plug.Debugger, otp_app: :cloud_drive
   end
 
+  @secret Application.get_env(:cloud_drive, :secret)
+
   plug Plug.Logger
   plug Plug.Static,
     at: "/static",
     from: "./web"
-  plug CloudDrive.Authenticate
+
+  plug :put_secret_key_base
+
   plug Plug.Parsers,
     parsers: [:multipart, :json],
     pass: ["*/*"],
@@ -27,6 +31,7 @@ defmodule CloudDrive.Router do
     key_length: 64,
     log: :debug
 
+  plug Ueberauth #plug CloudDrive.Authenticate
   plug :fetch_session
 
   plug :match
@@ -42,21 +47,28 @@ defmodule CloudDrive.Router do
     |> send_resp(:ok, View.New.render(conn))
   end
 
-  get "/auth/google" do
-    conn
-    |> send_resp(:ok, View.Login.render(conn))
-  end
+  # Route to authenticate with Google. We don't do anything here because
+  # CloudDrive.Authenticate will intercept this route and redirect it to
+  # Google.
+  #get "/auth/google" do
+    #conn |> send_resp(:ok, "hello")
+  #end
 
+  # Google will redirect to this route when user has logged in with a Google
+  # account.
   get "/auth/google/callback" do
+    conn =
+      case conn.assigns do
+        %{ueberauth_auth: auth} ->
+          user = auth.info
+          IO.inspect user
+          conn |> put_session(:user, user)
+        _ ->
+          IO.inspect conn.assigns
+          conn
+      end
 
-  end
-
-  post "/auth/google/callback" do
-
-  end
-
-  delete "/logout" do
-
+    conn |> redirect(to: "/")
   end
 
   post "/file-upload" do
@@ -107,6 +119,10 @@ defmodule CloudDrive.Router do
   #      list -> [message | list]
   #    end)
   #end
+
+  def put_secret_key_base(conn, _) do
+    put_in conn.secret_key_base, @secret[:secret_key_base]
+  end
 
   defp redirect(conn, opts) do
     url = opts[:to]
