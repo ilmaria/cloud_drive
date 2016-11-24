@@ -23,10 +23,13 @@
 
   <nav>
     <%= if @user do %>
-      <span>You are signed in as <%= @user.name %></span>
+      <span>You are signed in as <%= @user.name %></span> |
+      <form action="/auth/logout" method="post" class="inline-block">
+        <button class="link-btn">Logout</button>
+      </form>
     <% else %>
       <a href="/auth/google">Sign in with Google</a>
-    <% end %>
+    <% end %> |
     <a href="/file/add">Add files</a> |
     <button class="link-btn" onclick="deleteSelectedFiles()">Delete file</button>
   </nav>

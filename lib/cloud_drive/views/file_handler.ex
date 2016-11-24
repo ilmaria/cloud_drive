@@ -1,8 +1,6 @@
 defmodule CloudDrive.Views.FileHandler do
   use CloudDrive.View
-  use CloudDrive.Database
-  alias CloudDrive.Database
-  use Amnesia
+  use CloudDrive.Database, as: Database
   require Logger
 
   get "/add" do
@@ -13,14 +11,14 @@ defmodule CloudDrive.Views.FileHandler do
 
   post "/upload" do
     files = conn.params["files"]
-    user = conn.assigns[:user]
+    user = conn |> get_session(:user)
 
     Enum.map files, fn file ->
       cloud_file = Database.save(CloudFile, file, [user: user])
 
       Logger.info """
       File upload
-      User: #{user.username}
+      User: #{user.email}
       File: #{cloud_file.name}
       Size: #{cloud_file.size |> Sizeable.filesize}\
       """

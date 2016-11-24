@@ -1,25 +1,23 @@
 defmodule CloudDrive.Views.Home do
   use CloudDrive.View
-  use CloudDrive.Database
-  alias CloudDrive.Database
-  use Amnesia
+  use CloudDrive.Database, as: Database
   use Timex
   require Logger
 
   get "/" do
-    user = Amnesia.transaction do
-      case User.first do
-        nil -> %User{username: "ilmari", password: "ilmari"} |> User.write
-        user -> user
+    user = conn |> get_session(:user)
+
+    files =
+      if user do
+        Database.where CloudFile,
+          owner_id == user.id
+      else
+        []
       end
-    end
 
-    auth_user = conn |> get_session(:user)
-
-    files = Database.where CloudFile,
-      owner_id == user.id
     tags = Database.all(Tag)
-    template = render_template(files: files, tags: tags, user: auth_user)
+
+    template = render_template(files: files, tags: tags, user: user)
 
     conn |> send_resp(:ok, template)
   end
