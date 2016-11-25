@@ -13,6 +13,8 @@ defmodule CloudDrive.Views.Auth do
 
           Logger.info "User: #{user.email} has logged in."
 
+          IO.puts "Assign token to session"
+          IO.puts auth.credentials.token
           conn
           |> put_session(:user, user)
           |> put_session(:google_api_token, auth.credentials.token)

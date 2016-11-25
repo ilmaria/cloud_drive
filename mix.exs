@@ -31,6 +31,7 @@ defmodule CloudDrive.Mixfile do
      {:poison, "~> 3.0", override: true},
      {:ueberauth, "~> 0.4"},
      {:ueberauth_google, "~> 0.4"},
+     {:httpoison, "~> 0.10.0"},
      {:cowboy, "~> 1.0"}]
   end
 end

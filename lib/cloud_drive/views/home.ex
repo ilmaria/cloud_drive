@@ -6,6 +6,7 @@ defmodule CloudDrive.Views.Home do
 
   get "/" do
     user = conn |> get_session(:user)
+    token = conn |> get_session(:google_api_token)
 
     files =
       if user do
@@ -14,6 +15,11 @@ defmodule CloudDrive.Views.Home do
       else
         []
       end
+
+    IO.puts token
+    IO.inspect HTTPoison.get("https://www.googleapis.com/drive/v3/files",
+      [{"Authorization", "Bearer #{token}"}],
+      params: [pageSize: 100, q: "'root' in parents and trashed = false"]), pretty: true
 
     tags = Database.all(Tag)
 

@@ -59,11 +59,11 @@ defdatabase CloudDrive.Database.Tables do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
-      matched_files = CloudFile.match(
+      [matched_files] = CloudFile.match(
         owner_id: user.id,
         name: file.filename,
-        tags: tags)
-      |> Amnesia.Selection.values
+        tags: tags
+      ) |> Amnesia.Selection.values
 
       case matched_files do
         [file_to_update] -> file_to_update
