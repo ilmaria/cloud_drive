@@ -16,7 +16,8 @@ config :cloud_drive, :server,
 config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [
-      default_scope: "email https://www.googleapis.com/auth/drive.readonly"
+      default_scope: "email https://www.googleapis.com/auth/drive.readonly",
+      access_type: "offline"
     ]}
   ]
 

@@ -16,10 +16,11 @@ defmodule CloudDrive.Views.Home do
         []
       end
 
-    IO.puts token
-    IO.inspect HTTPoison.get("https://www.googleapis.com/drive/v3/files",
+    _ = """
+    HTTPoison.get("https://www.googleapis.com/drive/v3/files",
       [{"Authorization", "Bearer #{token}"}],
-      params: [pageSize: 100, q: "'root' in parents and trashed = false"]), pretty: true
+      params: [pageSize: 100, q: "'root' in parents and trashed = false"])
+    """
 
     tags = Database.all(Tag)
 

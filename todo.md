@@ -16,3 +16,10 @@
 
 ## visuals
   - <http://imgur.com/gallery/VqrRH>
+
+## security
+  - [ ] csrf
+  - [ ] ssl
+
+## testing
+  - [ ] revoke access to google account
