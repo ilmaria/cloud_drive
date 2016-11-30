@@ -75,7 +75,7 @@ defdatabase CloudDrive.Database.Tables do
     @doc"""
     Save a new file to the database.
     """
-    def save(file, opts \\ []) do
+    def save(%Plug.Upload{} = file, opts \\ []) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
@@ -100,6 +100,22 @@ defdatabase CloudDrive.Database.Tables do
 
       %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
       |> CloudFile.write
+    end
+
+    def save(%GoogleDrive.File{} = file, opts \\ []) do
+      user = opts |> Keyword.get(:user)
+      tags = opts |> Keyword.get(:tags, [])
+
+      cloud_file = %CloudFile{
+        owner_id: user.id,
+        tags: tags,
+        url: "",
+        size: File.stat!(file.path).size,
+        creation_time: DateTime.utc_now,
+        modified_time: DateTime.utc_now,
+        name: file.filename,
+        mime_type: file.content_type
+      } |> CloudFile.write
     end
 
     def remove(fileId) do

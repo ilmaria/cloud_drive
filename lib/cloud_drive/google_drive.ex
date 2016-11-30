@@ -1,4 +1,5 @@
 defmodule CloudDrive.GoogleDrive do
+  use CloudDrive.Database, as: Database
   require Logger
 
   @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
@@ -8,6 +9,17 @@ defmodule CloudDrive.GoogleDrive do
     :ueberauth, Ueberauth.Strategy.Google.OAuth)
   @client_id @google_oauth[:client_id]
   @client_secret @google_oauth[:client_secret]
+
+  def sync() do
+    file_list = files(
+      orderBy: "name",
+      q: "mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+      spaces: "drive")
+
+    Enum.each file_list, fn file ->
+      Database.save(CloudFile, file)
+    end
+  end
 
   def refresh_token!(token) do
     case refresh_token do
@@ -46,7 +58,7 @@ defmodule CloudDrive.GoogleDrive do
   end
 
   def files(params \\ []) do
-    response = HTTPoison.get @api_endpoint,
+    response = HTTPoison.get @api_endpoint <> "/files",
       [{"Content-Type", "application/json"}],
       params: params
 
