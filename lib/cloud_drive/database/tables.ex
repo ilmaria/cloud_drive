@@ -39,14 +39,15 @@ defdatabase CloudDrive.Database.Tables do
       modified_time:  DateTime.t,
       owner_id:       non_neg_integer,
       url:            String.t,
-      size:           non_neg_integer
+      size:           non_neg_integer,
+      location:       atom
     }
 
     @user_files "user_files/"
     @shared_url "shared"
 
     @doc"""
-    A helper function to access the owning User.
+    A helper function to access the owner.
     """
     def owner(self) do
       User.read(self.owner_id)
@@ -88,7 +89,8 @@ defdatabase CloudDrive.Database.Tables do
         creation_time: DateTime.utc_now,
         modified_time: DateTime.utc_now,
         name: file.filename,
-        mime_type: file.content_type
+        mime_type: file.content_type,
+        location: :cloud_drive
       } |> CloudFile.write
 
       File.mkdir(@user_files)
@@ -106,15 +108,12 @@ defdatabase CloudDrive.Database.Tables do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
-      cloud_file = %CloudFile{
+      %CloudFile{
         owner_id: user.id,
         tags: tags,
-        url: "",
-        size: File.stat!(file.path).size,
-        creation_time: DateTime.utc_now,
-        modified_time: DateTime.utc_now,
-        name: file.filename,
-        mime_type: file.content_type
+        name: file.name,
+        mime_type: file.mimeType,
+        location: :google_drive
       } |> CloudFile.write
     end
 
