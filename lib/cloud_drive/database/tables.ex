@@ -29,7 +29,8 @@ defdatabase CloudDrive.Database.Tables do
   end
 
   deftable CloudFile, [{:id, autoincrement}, :name, :tags, :mime_type,
-                  :creation_time, :modified_time, :owner_id, :url, :size] do
+                  :creation_time, :modified_time, :owner_id, :url, :size,
+                  :location] do
     @type t :: %CloudFile{
       id:             non_neg_integer,
       name:           String.t,
@@ -84,11 +85,11 @@ defdatabase CloudDrive.Database.Tables do
       cloud_file = %CloudFile{
         owner_id: user.id,
         tags: tags,
+        name: file.filename,
         url: "",
         size: File.stat!(file.path).size,
         creation_time: DateTime.utc_now,
         modified_time: DateTime.utc_now,
-        name: file.filename,
         mime_type: file.content_type,
         location: :cloud_drive
       } |> CloudFile.write
@@ -112,6 +113,10 @@ defdatabase CloudDrive.Database.Tables do
         owner_id: user.id,
         tags: tags,
         name: file.name,
+        url: file.webViewLink,
+        size: file.size,
+        creation_time: file.createdTime,
+        modified_time: file.modifiedTime,
         mime_type: file.mimeType,
         location: :google_drive
       } |> CloudFile.write

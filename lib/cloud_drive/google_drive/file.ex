@@ -6,7 +6,7 @@ defmodule CloudDrive.GoogleDrive.File do
     createdTime:  DateTime.t,
     modifiedTime: DateTime.t,
     size:         non_neg_number | nil,
-    parent:       [String.t]
+    parents:       [String.t]
   }
 
   defstruct [:name, :mimeType, :webViewLink, :parents,
