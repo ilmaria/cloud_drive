@@ -9,10 +9,9 @@ defmodule CloudDrive.Views.Auth do
     conn =
       case conn.assigns do
         %{ueberauth_auth: auth} ->
-          Logger.info(inspect auth.credentials, pretty: true)
           user = Database.get(User, email: auth.info.email)
 
-          Logger.info "User: #{user} has logged in."
+          Logger.info "User: #{user.email} has logged in."
 
           IO.puts "Assign token to session"
           IO.puts auth.credentials.token
@@ -26,7 +25,12 @@ defmodule CloudDrive.Views.Auth do
       end
 
     _ = """
-    %User{email: "ilmari.autio@gmail.com", name: "Ilmari"} |> User.write
+    use Amnesia
+    require Amnesia
+    alias CloudDrive.Database.Tables.User
+    Amnesia.transaction do
+      %User{email: "ilmari.autio@gmail.com", name: "Ilmari"} |> User.write
+    end
     a = %Ueberauth.Auth{
       credentials: %Ueberauth.Auth.Credentials{
         expires: true, expires_at: 1479990770,

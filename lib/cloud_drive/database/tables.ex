@@ -137,6 +137,7 @@ defdatabase CloudDrive.Database.Tables do
   def get_or_create_tag(tag_name) do
     Amnesia.transaction do
       match = Tag.match(name: tag_name)
+      |> Amnesia.Selection.values
 
       case match do
         [first|_] -> first
@@ -174,7 +175,7 @@ defdatabase CloudDrive.Database.Tables do
       Amnesia.transaction do
         unquote(table).match(unquote(query))
         |> Amnesia.Selection.values
-        |> List.first
+        |> hd
       end
     end
   end

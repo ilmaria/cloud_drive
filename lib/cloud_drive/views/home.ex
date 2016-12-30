@@ -10,7 +10,7 @@ defmodule CloudDrive.Views.Home do
     token = conn |> get_session(:google_api_token)
 
     if user do
-      import_google_drive(token)
+      #import_google_drive(user, token)
     end
 
     files =
@@ -39,7 +39,7 @@ defmodule CloudDrive.Views.Home do
     |> Timex.format("{relative}", :relative) do
       {:ok, time} -> time
       {:error, reason} ->
-        Logger.error reason
+        Logger.error inspect(reason, pretty: true)
         "-"
     end
   end

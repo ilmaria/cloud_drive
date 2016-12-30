@@ -65,7 +65,7 @@
           <%= for file <- @files do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
+              <td><%= file.size %> <%# Sizeable.filesize(file.size, %{round: 1}) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>
@@ -85,7 +85,7 @@
           <%= for file <- @files do %>
             <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><%= file.size |> Sizeable.filesize(%{round: 1}) %>
+              <td><%= file.size %> <%# Sizeable.filesize(file.size, %{round: 1}) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>

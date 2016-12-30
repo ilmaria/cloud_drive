@@ -1,5 +1,7 @@
 defmodule CloudDrive do
   use Application
+  use CloudDrive.Database, as: Database
+  alias CloudDrive.Database.Tables.User
 
   @server Application.get_env(:cloud_drive, :server)
   @scheme @server[:scheme]
@@ -16,9 +18,15 @@ defmodule CloudDrive do
         @scheme, CloudDrive.Router, [], [port: @port])
     ]
 
+    populate_db()
+
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: CloudDrive.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  def populate_db() do
+    Database.save(User, %User{email: "ilmari.autio@gmail.com", name: "Ilmari"})
   end
 end
