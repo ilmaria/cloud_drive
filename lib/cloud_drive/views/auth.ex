@@ -9,10 +9,10 @@ defmodule CloudDrive.Views.Auth do
     conn =
       case conn.assigns do
         %{ueberauth_auth: auth} ->
-          Logger.info(inspect auth.info, pretty: true)
+          Logger.info(inspect auth.credentials, pretty: true)
           user = Database.get(User, email: auth.info.email)
 
-          Logger.info "User: #{user.email} has logged in."
+          Logger.info "User: #{user} has logged in."
 
           IO.puts "Assign token to session"
           IO.puts auth.credentials.token
@@ -20,7 +20,7 @@ defmodule CloudDrive.Views.Auth do
           |> put_session(:user, user)
           |> put_session(:google_api_token, auth.credentials.token)
         _ ->
-          Logger.info "Login failed: #{conn.assigns}"
+          Logger.info "Login failed: #{inspect conn.assigns, pretty: true}"
 
           conn
       end

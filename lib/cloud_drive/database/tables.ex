@@ -16,12 +16,14 @@ defdatabase CloudDrive.Database.Tables do
     end
   end
 
-  deftable User, [{:id, autoincrement}, :email, :name, :password_hash] do
+  deftable User, [{:id, autoincrement}, :email, :name, :password_hash,
+                  :google_refresh_token] do
     @type t :: %User{
-      id:             non_neg_integer,
-      email:          String.t,
-      name:           String.t,
-      password_hash:  String.t
+      id:                   non_neg_integer,
+      email:                String.t,
+      name:                 String.t,
+      password_hash:        String.t,
+      google_refresh_token: String.t
     }
 
     def save(user, _opts) do
@@ -30,8 +32,8 @@ defdatabase CloudDrive.Database.Tables do
   end
 
   deftable CloudFile, [{:id, autoincrement}, :name, :tags, :mime_type,
-                  :creation_time, :modified_time, :owner_id, :url, :size,
-                  :location] do
+                       :creation_time, :modified_time, :owner_id, :url,
+                       :size, :location] do
     @type t :: %CloudFile{
       id:             non_neg_integer,
       name:           String.t,

@@ -10,7 +10,7 @@ defmodule CloudDrive.Views.Home do
     token = conn |> get_session(:google_api_token)
 
     if user do
-      import_google_drive()
+      import_google_drive(token)
     end
 
     files =
