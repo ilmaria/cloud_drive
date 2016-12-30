@@ -5,8 +5,8 @@ defmodule CloudDrive.GoogleDrive.File do
     webViewLink:  String.t,
     createdTime:  DateTime.t,
     modifiedTime: DateTime.t,
-    size:         non_neg_number | nil,
-    parents:       [String.t]
+    size:         non_neg_integer | nil,
+    parents:      [String.t]
   }
 
   defstruct [:name, :mimeType, :webViewLink, :parents,

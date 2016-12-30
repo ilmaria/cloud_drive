@@ -1,5 +1,6 @@
 use Amnesia
 alias CloudDrive.Hashids, as: H
+alias CloudDrive.GoogleDrive
 
 defdatabase CloudDrive.Database.Tables do
 
@@ -77,7 +78,9 @@ defdatabase CloudDrive.Database.Tables do
     @doc"""
     Save a new file to the database.
     """
-    def save(%Plug.Upload{} = file, opts \\ []) do
+    def save(file, opts \\ [])
+
+    def save(%Plug.Upload{} = file, opts) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
@@ -105,7 +108,7 @@ defdatabase CloudDrive.Database.Tables do
       |> CloudFile.write
     end
 
-    def save(%GoogleDrive.File{} = file, opts \\ []) do
+    def save(%GoogleDrive.File{} = file, opts) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
@@ -126,6 +129,17 @@ defdatabase CloudDrive.Database.Tables do
       File.rm!(@user_files <> H.encode(fileId))
 
       CloudFile.delete(fileId)
+    end
+  end
+
+  def get_or_create_tag(tag_name) do
+    Amnesia.transaction do
+      match = Tag.match(name: tag_name)
+
+      case match do
+        [first|_] -> first
+        [] ->  %Tag{name: tag_name} |> Tag.write
+      end
     end
   end
 

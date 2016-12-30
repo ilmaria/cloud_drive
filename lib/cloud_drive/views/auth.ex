@@ -9,6 +9,7 @@ defmodule CloudDrive.Views.Auth do
     conn =
       case conn.assigns do
         %{ueberauth_auth: auth} ->
+          Logger.info(inspect auth.info, pretty: true)
           user = Database.get(User, email: auth.info.email)
 
           Logger.info "User: #{user.email} has logged in."

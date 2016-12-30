@@ -2,11 +2,16 @@ defmodule CloudDrive.Views.Home do
   use CloudDrive.View
   use CloudDrive.Database, as: Database
   use Timex
+  import CloudDrive.GoogleDrive
   require Logger
 
   get "/" do
     user = conn |> get_session(:user)
     token = conn |> get_session(:google_api_token)
+
+    if user do
+      import_google_drive()
+    end
 
     files =
       if user do

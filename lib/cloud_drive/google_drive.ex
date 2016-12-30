@@ -6,8 +6,7 @@ defmodule CloudDrive.GoogleDrive do
   @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
   @account_endpoint "https://accounts.google.com/o/oauth2/v2/auth"
   @api_endpoint "https://www.googleapis.com/drive/v3"
-  @google_oauth Application.get_env(
-    :ueberauth, Ueberauth.Strategy.Google.OAuth)
+  @google_oauth Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)
   @client_id @google_oauth[:client_id]
   @client_secret @google_oauth[:client_secret]
 
@@ -15,7 +14,7 @@ defmodule CloudDrive.GoogleDrive do
   Get all files from Google Drive and sync their info to Cloud Drive
   database.
   """
-  def sync() do
+  def import_google_drive() do
     {:ok, files} = get_files()
     {:ok, folders} = get_folders()
 
@@ -26,9 +25,7 @@ defmodule CloudDrive.GoogleDrive do
     end
   end
 
-  @doc"""
-  Create tags for Google Drive files by using parent folders as tag names.
-  """
+  # Create tags for Google Drive files by using parent folders as tag names.
   defp create_tags(file, folders) do
     Enum.map file.parents, fn parent_id ->
       parent = Enum.find folders, fn folder ->
@@ -76,9 +73,8 @@ defmodule CloudDrive.GoogleDrive do
     end
   end
 
-  @doc"""
-  Use Google Drive `files.list` api to get a list of files or folders.
-  """
+
+  # Use Google Drive `files.list` api to get a list of files or folders.
   defp get_drive_file_list(params, struct_module) do
 
     response = HTTPoison.get @api_endpoint <> "/files",
@@ -88,14 +84,15 @@ defmodule CloudDrive.GoogleDrive do
     case response do
       {:ok, resp} ->
         resp_body = Poison.decode! resp.body
+        Logger.info(inspect resp_body, pretty: true)
         next_token = Map.get(resp_body, "nextPageToken")
-        files = Poison.decode! resp_body["files"], as: [struct!(struct_module)]
+        files = Poison.decode! resp_body["files"], as: struct!(struct_module)
 
         if !next_token do
           {:ok, files}
         else
           next_page = get_drive_file_list(
-            [nextPageToken: next_token] ++ params)
+            [nextPageToken: next_token] ++ params, struct_module)
 
           additional_files = case next_page do
             {:ok, list} -> list
@@ -112,7 +109,7 @@ defmodule CloudDrive.GoogleDrive do
   Refresh Google Drive token. Throw on error.
   """
   def refresh_token!(token) do
-    case refresh_token do
+    case refresh_token(token) do
       {:ok, resp} -> resp
       {:error, reason} -> throw reason
     end
@@ -135,7 +132,7 @@ defmodule CloudDrive.GoogleDrive do
       {:ok, resp} ->
         new_token = resp.body
         |> Poison.decode!
-        |> Map.take ["access_token", "expires_in"]
+        |> Map.take(["access_token", "expires_in"])
 
         {:ok, new_token}
       _ ->
