@@ -175,7 +175,7 @@ defdatabase CloudDrive.Database.Tables do
       Amnesia.transaction do
         unquote(table).match(unquote(query))
         |> Amnesia.Selection.values
-        |> hd
+        |> List.first
       end
     end
   end

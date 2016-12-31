@@ -1,7 +1,7 @@
 defmodule CloudDrive do
   use Application
   use CloudDrive.Database, as: Database
-  alias CloudDrive.Database.Tables.User
+  require Logger
 
   @server Application.get_env(:cloud_drive, :server)
   @scheme @server[:scheme]
@@ -27,6 +27,8 @@ defmodule CloudDrive do
   end
 
   def populate_db() do
-    Database.save(User, %User{email: "ilmari.autio@gmail.com", name: "Ilmari"})
+    if !Database.get(User, email: "ilmari.autio@gmail.com") do
+      Database.save(User, %User{email: "ilmari.autio@gmail.com", name: "Ilmari"})
+    end
   end
 end

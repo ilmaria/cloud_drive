@@ -1,7 +1,6 @@
 defmodule CloudDrive.Views.Home do
   use CloudDrive.View
   use CloudDrive.Database, as: Database
-  use Timex
   import CloudDrive.GoogleDrive
   require Logger
 
@@ -42,6 +41,11 @@ defmodule CloudDrive.Views.Home do
         Logger.error inspect(reason, pretty: true)
         "-"
     end
+  end
+
+  def compact_size(nil), do: "-"
+  def compact_size(file_size) do
+    Sizeable.filesize(file_size, %{round: 1})
   end
 
   match _ do

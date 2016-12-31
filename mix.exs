@@ -17,7 +17,7 @@ defmodule CloudDrive.Mixfile do
   end
 
   defp apps(:prod), do: [:logger, :cowboy, :plug, :amnesia,
-    :ueberauth_google]
+    :ueberauth_google, :timex]
   defp apps(_env), do: apps(:prod) ++ [:remix]
 
   # Dependencies

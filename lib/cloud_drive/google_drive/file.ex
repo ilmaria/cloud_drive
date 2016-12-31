@@ -12,3 +12,12 @@ defmodule CloudDrive.GoogleDrive.File do
   defstruct [:name, :mimeType, :webViewLink, :parents,
              :createdTime, :modifiedTime, :size]
 end
+
+defimpl Poison.Decoder, for: CloudDrive.GoogleDrive.File do
+  use Timex
+
+  def decode(value, _options) do
+    %{value | modifiedTime: Timex.parse!(value.modifiedTime, "{ISO:Extended:Z}"),
+              createdTime: Timex.parse!(value.createdTime, "{ISO:Extended:Z}")}
+  end
+end

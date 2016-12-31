@@ -62,10 +62,10 @@
             <th>File size
             <th>Last modified
         <tbody>
-          <%= for file <- @files do %>
+          <%= for file <- Enum.take @files, 4 do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><%= file.size %> <%# Sizeable.filesize(file.size, %{round: 1}) %>
+              <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>
@@ -85,7 +85,7 @@
           <%= for file <- @files do %>
             <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><%= file.size %> <%# Sizeable.filesize(file.size, %{round: 1}) %>
+              <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
       </table>
