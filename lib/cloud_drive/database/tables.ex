@@ -78,16 +78,13 @@ defdatabase CloudDrive.Database.Tables do
     end
 
     @doc"""
-    Save a new file to the database.
+    Transform file to CloudFile struct.
     """
-    def save(file, opts \\ [])
-
-    def save(%Plug.Upload{} = file, opts) do
+    def from_file(%Plug.Upload{} = file, opts) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
-      # create file first to get auto incremented id
-      cloud_file = %CloudFile{
+      %CloudFile{
         owner_id: user.id,
         tags: tags,
         name: file.filename,
@@ -97,20 +94,10 @@ defdatabase CloudDrive.Database.Tables do
         modified_time: DateTime.utc_now,
         mime_type: file.content_type,
         location: :cloud_drive
-      } |> CloudFile.write
-
-      File.mkdir(@user_files)
-
-      # we use hashed id for file name and shared url
-      hash = H.encode(cloud_file.id)
-
-      File.cp!(file.path, @user_files <> hash)
-
-      %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
-      |> CloudFile.write
+      }
     end
 
-    def save(%GoogleDrive.File{} = file, opts) do
+    def from_file(%GoogleDrive.File{} = file, opts) do
       user = opts |> Keyword.get(:user)
       tags = opts |> Keyword.get(:tags, [])
 
@@ -124,7 +111,30 @@ defdatabase CloudDrive.Database.Tables do
         modified_time: file.modifiedTime,
         mime_type: file.mimeType,
         location: :google_drive
-      } |> CloudFile.write
+      }
+    end
+
+    @doc"""
+    Save a new file to the database.
+    """
+    def save(file, opts \\ [])
+
+    def save(%Plug.Upload{} = file, opts) do
+      cloud_file = file |> from_file(opts) |> CloudFile.write
+
+      File.mkdir(@user_files)
+
+      # we use hashed id for file name and shared url
+      hash = H.encode(cloud_file.id)
+
+      File.cp!(file.path, @user_files <> hash)
+
+      %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
+      |> CloudFile.write
+    end
+
+    def save(%GoogleDrive.File{} = file, opts) do
+      file |> from_file(opts) |> CloudFile.write
     end
 
     def remove(fileId) do
@@ -142,6 +152,26 @@ defdatabase CloudDrive.Database.Tables do
       case match do
         [first|_] -> first
         [] ->  %Tag{name: tag_name} |> Tag.write
+      end
+    end
+  end
+
+  def create_or_update_file(%GoogleDrive.File{} = file, user, tags) do
+    Amnesia.transaction do
+      existing_file = CloudFile.match(
+        name: file.name, user_id: user.id, tags: tags)
+        |> Amnesia.Selection.values
+        |> List.first
+
+      if existing_file do
+        updated_file = file
+        |> CloudFile.from_file(user: user, tags: tags)
+        |> Map.from_struct
+        |> Map.merge(%{id: existing_file.id})
+
+        struct!(CloudFile, updated_file) |> CloudFile.write
+      else
+        CloudFile.save(file, user: user, tags: tags)
       end
     end
   end

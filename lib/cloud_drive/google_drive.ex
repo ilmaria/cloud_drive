@@ -14,33 +14,35 @@ defmodule CloudDrive.GoogleDrive do
   Get all files from Google Drive and sync their info to Cloud Drive
   database.
   """
-  def import_google_drive(user, token) do
+  def sync_google_drive(user, token) do
     files = get_files(token)
     folders = get_folders(token)
 
     Enum.each files, fn file ->
-      tags = create_tags(file, folders)
+      tags = get_tags(file, folders)
 
-      Database.save(CloudFile, file, user: user, tags: tags)
+      Database.create_or_update_file(file, user, tags)
     end
   end
 
-  # Create tags for Google Drive files by using parent folders as tag names.
-  defp create_tags(file, folders) do
-    parents = if file.parents, do: file.parents, else: []
+  # Get tags for Google Drive files by using parent folders as tag names.
+  defp get_tags(file, folders) do
+    parents = file.parents || []
 
-    Enum.map parents, fn parent_id ->
+    Enum.map(parents, fn parent_id ->
       parent = Enum.find folders, fn folder ->
         folder.id == parent_id
       end
 
-      if is_nil parent do
+      if !parent do
         Logger.info "Nil parent: #{inspect(parents)}"
-        #Logger.info inspect(folders)
+        nil
       else
-        Database.get_or_create_tag(parent.name)
+        tag = Database.get_or_create_tag(parent.name)
+        tag.id
       end
-    end
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
   @doc"""

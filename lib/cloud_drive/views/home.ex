@@ -9,7 +9,7 @@ defmodule CloudDrive.Views.Home do
     token = conn |> get_session(:google_api_token)
 
     if user do
-      #import_google_drive(user, token)
+      sync_google_drive(user, token)
     end
 
     files =
@@ -20,14 +20,7 @@ defmodule CloudDrive.Views.Home do
         []
       end
 
-    _ = """
-    HTTPoison.get("https://www.googleapis.com/drive/v3/files",
-      [{"Authorization", "Bearer #{token}"}],
-      params: [pageSize: 100, q: "'root' in parents and trashed = false"])
-    """
-
     tags = Database.all(Tag)
-
     template = render_template(files: files, tags: tags, user: user)
 
     conn |> send_resp(:ok, template)
