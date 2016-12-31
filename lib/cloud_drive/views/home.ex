@@ -35,7 +35,7 @@ defmodule CloudDrive.Views.Home do
 
   def last_modified_time(file) do
     case file.modified_time
-    |> Timex.format("{relative}", :relative) do
+    |> Timex.format("{YYYY}-{0M}-{0D}") do
       {:ok, time} -> time
       {:error, reason} ->
         Logger.error inspect(reason, pretty: true)
