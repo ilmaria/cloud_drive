@@ -13,6 +13,10 @@ config :cloud_drive, :server,
   port: 8000,
   scheme: :http
 
+config :cloud_drive, :settings,
+  shared_files_folder: "user_files/",
+  shared_url: "shared"
+
 config :ueberauth, Ueberauth,
   providers: [
     google: {Ueberauth.Strategy.Google, [

@@ -13,6 +13,7 @@
   - [ ] make files removable from "recent files" list
 
 ## google drive integration
+  - [ ] use OpenID
 
 ## visuals
   - <http://imgur.com/gallery/VqrRH>

@@ -41,6 +41,8 @@ defmodule CloudDrive.Router do
 
   forward "/auth", to: Views.Auth
 
+  forward "/shared", to: Views.SharedFiles
+
   forward "/", to: Views.Home
 
   @secret Application.get_env(:cloud_drive, :secret)

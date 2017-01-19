@@ -37,7 +37,7 @@ defdatabase CloudDrive.Database.Tables do
     @type t :: %CloudFile{
       id:             non_neg_integer,
       name:           String.t,
-      tags:           [Tag.t],
+      tags:           [non_neg_integer],
       mime_type:      String.t,
       creation_time:  DateTime.t,
       modified_time:  DateTime.t,
@@ -47,8 +47,9 @@ defdatabase CloudDrive.Database.Tables do
       location:       atom
     }
 
-    @user_files "user_files/"
-    @shared_url "shared"
+    @app_settings Application.get_env(:cloud_drive, :settings)
+    @shared_folder @app_settings[:shared_files_folder]
+    @shared_url @app_settings[:shared_url]
 
     @doc"""
     A helper function to access the owner.
@@ -122,12 +123,12 @@ defdatabase CloudDrive.Database.Tables do
     def save(%Plug.Upload{} = file, opts) do
       cloud_file = file |> from_file(opts) |> CloudFile.write
 
-      File.mkdir(@user_files)
+      File.mkdir(@shared_folder)
 
       # we use hashed id for file name and shared url
       hash = H.encode(cloud_file.id)
 
-      File.cp!(file.path, @user_files <> hash)
+      File.cp!(file.path, @shared_folder <> hash)
 
       %{cloud_file | url: "/#{@shared_url}/#{hash}/#{file.filename}"}
       |> CloudFile.write
@@ -138,7 +139,7 @@ defdatabase CloudDrive.Database.Tables do
     end
 
     def remove(fileId) do
-      File.rm!(@user_files <> H.encode(fileId))
+      File.rm!(@shared_folder <> H.encode(fileId))
 
       CloudFile.delete(fileId)
     end

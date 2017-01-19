@@ -94,6 +94,7 @@ defmodule CloudDrive.GoogleDrive do
 
     case response do
       {:ok, resp} ->
+        #TODO: check if response code is ok before doing anything
         resp_body = Poison.decode! resp.body
         next_token = Map.get(resp_body, "nextPageToken")
         files = Enum.map resp_body["files"], fn file_map ->
