@@ -59,12 +59,14 @@
         <thead>
           <tr>
             <th>Name
+            <th>Link
             <th>File size
             <th>Last modified
         <tbody>
           <%= for file <- Enum.take @files, 4 do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td><%= file.name %>
+              <td><a href="<%= file.url %>">Open</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
@@ -79,12 +81,14 @@
         <thead>
           <tr>
             <th>Name
+            <th>Link
             <th>File size
             <th>Last modified
         <tbody>
           <%= for file <- @files do %>
             <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
+              <td><a href="<%= file.url %>">Open</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>

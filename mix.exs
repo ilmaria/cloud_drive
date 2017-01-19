@@ -7,23 +7,22 @@ defmodule CloudDrive.Mixfile do
      elixir: "~> 1.2",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
   def application do
-    [applications: apps(Mix.env),
+    [extra_applications: apps(Mix.env),
      mod: {CloudDrive, []}]
   end
 
-  defp apps(:prod), do: [:logger, :cowboy, :plug, :amnesia,
-    :ueberauth_google, :timex]
-  defp apps(_env), do: apps(:prod) ++ [:remix]
+  defp apps(:prod), do: [:logger]
+  defp apps(_env), do: [:logger, :remix]
 
   # Dependencies
   defp deps do
     [{:plug, "~> 1.2"},
-     {:remix, "~> 0.0.2"},
+     {:remix, "~> 0.0.2", runtime: false},
      {:amnesia, "~> 0.2.5"},
      {:hashids, "~> 2.0"},
      {:sizeable, "~> 0.1.5"},
