@@ -9,21 +9,23 @@ defmodule CloudDrive.Views.Home do
     token = conn |> get_session(:google_api_token)
 
     if user do
-      sync_google_drive(user, token)
-    end
-
-    files =
-      if user do
-        Database.where CloudFile,
-          owner_id == user.id
-      else
-        []
+      if !user.gdrive_synced do
+        sync_google_drive(user, token)
+        Database.save(User, %{user | gdrive_synced: true})
       end
 
-    tags = Database.all(Tag)
-    template = render_template(files: files, tags: tags, user: user)
+      files = Database.where CloudFile,
+        owner_id == user.id
 
-    conn |> send_resp(:ok, template)
+      tags = Database.all(Tag)
+      template = render_template(files: files, tags: tags, user: user)
+
+      conn |> send_resp(:ok, template)
+    else
+      template = render_template(files: [])
+
+      conn |> send_resp(:ok, template)
+    end
   end
 
   def last_modified_time(file) do

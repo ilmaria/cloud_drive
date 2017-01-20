@@ -2,6 +2,8 @@ use Amnesia
 alias CloudDrive.Hashids, as: H
 alias CloudDrive.GoogleDrive
 
+require Logger
+
 defdatabase CloudDrive.Database.Tables do
 
   deftable Tag, [{:id, autoincrement}, :name, :color] do
@@ -17,12 +19,13 @@ defdatabase CloudDrive.Database.Tables do
   end
 
   deftable User, [{:id, autoincrement}, :email, :name, :password_hash,
-                  :google_refresh_token] do
+                  :gdrive_synced, :google_refresh_token] do
     @type t :: %User{
       id:                   non_neg_integer,
       email:                String.t,
       name:                 String.t,
       password_hash:        String.t,
+      gdrive_synced:        boolean,
       google_refresh_token: String.t
     }
 
