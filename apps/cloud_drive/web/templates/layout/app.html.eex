@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Ilmari Autio">
+
+    <title>CloudDrive</title>
+
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/basscss.css") %>">
+    <link rel="stylesheet" href="<%= static_path(@conn, "/css/app.css") %>">
+
+    <script src="<%= static_path(@conn, "/libs/fuse.min.js") %>" defer></script>
+    <script src="<%= static_path(@conn, "/libs/axios.min.js") %>" defer></script>
+    <script src="<%= static_path(@conn, "/js/app.js") %>" defer></script>
+  </head>
+
+  <body>
+
+    <h1>Cloud Drive</h1>
+
+    <nav>
+      <%= if @user do %>
+        <span>You are signed in as <%= @user.name %></span> |
+        <form action="/auth/logout" method="post" class="inline-block">
+          <button class="link-btn">Logout</button>
+        </form>
+      <% else %>
+        <a href="/auth/google">Sign in with Google</a>
+      <% end %> |
+      <a href="/file/add">Add files</a> |
+      <button class="link-btn" onclick="deleteSelectedFiles()">Delete file</button>
+    </nav>
+
+    <p class="alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+    <p class="alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+
+    <main>
+      <%= render @view_module, @view_template, assigns %>
+    </main>
+
+  </body>
+</html>

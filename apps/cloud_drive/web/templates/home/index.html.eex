@@ -1,0 +1,60 @@
+<!-- search bar -->
+<section id="file-search" role="search">
+  <h3 class="mb0 center">Search</h3>
+
+  <div  class="flex" style="width: 100%">
+    <div style="width: 100%"></div>
+    <div>
+      <input type="search">
+    </div>
+    <div style="width: 100%"></div>
+  </div>
+</section>
+
+<!-- file view -->
+<div class="m3 self-stretch">
+
+  <!-- recent files -->
+  <section id="recent-files">
+    <h2>Recent files</h2>
+    <table class="left-align">
+      <thead>
+        <tr>
+          <th>Name
+          <th>Link
+          <th>File size
+          <th>Last modified
+      <tbody>
+        <%= for file <- Enum.take @files, 4 do %>
+          <tr id='<%= "recent-file-id-#{file.id}" %>'>
+            <td><%= file.name %>
+            <td><a href="<%= file.url %>">Open</a>
+            <td><%= compact_size(file.size) %>
+            <td><%= last_modified_time(file) %>
+        <% end %>
+    </table>
+  </section>
+
+  <!-- all files -->
+  <section id="all-files">
+    <h2 id="all-files-h">All files</h2>
+    <h2 id="search-results-h" class="display-none">Search results</h2>
+    <table class="left-align">
+      <thead>
+        <tr>
+          <th>Name
+          <th>Link
+          <th>File size
+          <th>Last modified
+      <tbody>
+        <%= for file <- @files do %>
+          <tr id='<%= "file-id-#{file.id}" %>'>
+            <td><%= file.name %>
+            <td><a href="<%= file.url %>">Open</a>
+            <td><%= compact_size(file.size) %>
+            <td><%= last_modified_time(file) %>
+        <% end %>
+    </table>
+  </section>
+
+</div>
