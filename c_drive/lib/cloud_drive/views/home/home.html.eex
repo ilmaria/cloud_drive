@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="My cloud drive">
+<meta name="author" content="Ilmari Autio">
+
+<title>CloudDrive</title>
+
+<!-- styles -->
+<link href="/static/css/basscss.css" rel="stylesheet">
+<link href="/static/css/app.css" rel="stylesheet">
+
+<!-- scripts -->
+<script src="/static/libs/fuse.min.js" defer></script>
+<script src="/static/libs/axios.min.js" defer></script>
+<script src="/static/js/app.js" defer></script>
+
+<!-- body -->
+<main class="flex flex-column items-center">
+
+  <h1>Cloud Drive</h1>
+
+  <nav>
+    <%= if @user do %>
+      <span>You are signed in as <%= @user.name %></span> |
+      <form action="/auth/logout" method="post" class="inline-block">
+        <button class="link-btn">Logout</button>
+      </form>
+    <% else %>
+      <a href="/auth/google">Sign in with Google</a>
+    <% end %> |
+    <a href="/file/add">Add files</a> |
+    <button class="link-btn" onclick="deleteSelectedFiles()">Delete file</button>
+  </nav>
+
+  <!-- search bar -->
+  <section id="file-search" role="search">
+
+    <h3 class="mb0 center">Search</h3>
+
+    <div  class="flex" style="width: 100%">
+      <div style="width: 100%"></div>
+      <div>
+        <input type="search">
+      </div>
+      <div style="width: 100%"></div>
+    </div>
+
+  </section>
+
+  <!-- file view -->
+  <div class="m3 self-stretch">
+
+    <!-- recent files -->
+    <section id="recent-files">
+      <h2>Recent files</h2>
+      <table class="left-align">
+        <thead>
+          <tr>
+            <th>Name
+            <th>Link
+            <th>File size
+            <th>Last modified
+        <tbody>
+          <%= for file <- Enum.take @files, 4 do %>
+            <tr id='<%= "recent-file-id-#{file.id}" %>'>
+              <td><%= file.name %>
+              <td><a href="<%= file.url %>">Open</a>
+              <td><%= compact_size(file.size) %>
+              <td><%= last_modified_time(file) %>
+          <% end %>
+      </table>
+    </section>
+
+    <!-- all files -->
+    <section id="all-files">
+      <h2 id="all-files-h">All files</h2>
+      <h2 id="search-results-h" class="display-none">Search results</h2>
+      <table class="left-align">
+        <thead>
+          <tr>
+            <th>Name
+            <th>Link
+            <th>File size
+            <th>Last modified
+        <tbody>
+          <%= for file <- @files do %>
+            <tr id='<%= "file-id-#{file.id}" %>'>
+              <td><%= file.name %>
+              <td><a href="<%= file.url %>">Open</a>
+              <td><%= compact_size(file.size) %>
+              <td><%= last_modified_time(file) %>
+          <% end %>
+      </table>
+    </section>
+
+  </div>
+
+</main>
+
+<script>
+  const FILE_LIST = <%= Poison.encode!(@files) %>
+</script>

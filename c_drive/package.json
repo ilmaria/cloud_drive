@@ -1,0 +1,10 @@
+{
+  "name": "cloud_drive",
+  "version": "1.0.0",
+  "description": "My CloudDrive",
+  "author": "Ilmari Autio",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+  }
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="My cloud drive">
+<meta name="author" content="Ilmari Autio">
+
+<title>CloudDrive</title>
+
+<link href="/static/css/basscss.css" rel="stylesheet">
+<link href="/static/css/app.css" rel="stylesheet">
+
+<main>
+
+  <h1>Cloud Drive</h1>
+
+  <a href="/">Home page</a>
+
+  <form method="post" action="upload" name="submit" enctype="multipart/form-data">
+    <input type="file" name="files[]" multiple>
+    <button type="submit" name="submit">Submit</button>
+  </form>
+
+</main>

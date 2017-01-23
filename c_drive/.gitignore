@@ -1,0 +1,11 @@
+/_build
+/cover
+/deps
+erl_crash.dump
+*.ez
+config/secret.exs
+/Mnesia*
+/.vscode
+/node_modules
+/web/app-bundle*
+/user_files
