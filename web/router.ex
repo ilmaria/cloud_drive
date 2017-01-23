@@ -9,14 +9,16 @@ defmodule CloudDrive.Router do
     plug :put_secure_browser_headers
   end
 
-  pipeline :authenticate do
-    plug Auth.Authenticate
-  end
-
   scope "/", CloudDrive do
     pipe_through [:browser, :authenticate]
 
     get "/", HomeController, :index
+    get "/google/callback", HomeController, :auth_callback
+    post "/logout", HomeController, :logout
+  end
+
+  scope "/login" CloudDrive do
+    pipe_through :browser
   end
 
   scope "/shared", CloudDrive do

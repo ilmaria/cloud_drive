@@ -28,12 +28,15 @@ defmodule CloudDrive.Mixfile do
   #
   # Type `mix help deps` for examples and options.
   defp deps do
-    [{:phoenix,              "~> 1.2.1"},
-     {:phoenix_html,         "~> 2.6"},
-     {:phoenix_live_reload,  "~> 1.0", only: :dev},
-     {:gettext,              "~> 0.11"},
-     {:cowboy,               "~> 1.0"},
-     {:ecto,                 "~> 2.1"},
-     {:ecto_mnesia,          "~> 0.7.1"}]
+    [{:phoenix,             "~> 1.2.1"},
+     {:phoenix_html,        "~> 2.6"},
+     {:phoenix_live_reload, "~> 1.0", only: :dev},
+     {:gettext,             "~> 0.11"},
+     {:cowboy,              "~> 1.0"},
+     {:ecto,                "~> 2.1"},
+     {:ecto_mnesia,         "~> 0.7.1"},
+     {:guardian,            "~> 0.14"},
+     {:ueberauth,           "~> 0.4"},
+     {:ueberauth_google,    "~> 0.5"}]
   end
 end
