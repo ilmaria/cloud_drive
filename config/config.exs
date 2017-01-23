@@ -5,13 +5,17 @@
 # is restricted to this project.
 use Mix.Config
 
+config :cloud_drive,
+  ecto_repos: [Storage.Repo]
+
+config :cloud_drive, Storage.Repo,
+  adapter: Ecto.Adapters.Mnesia
+
 # Configures the endpoint
 config :cloud_drive, CloudDrive.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "tOgdG9WopS6SJZjNZyfugVNuos5U5btlwDwqefF7+AMDk9bL87N8fB8ocirkSOAl",
-  render_errors: [view: CloudDrive.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: CloudDrive.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  render_errors: [view: CloudDrive.ErrorView, accepts: ~w(html json)]
 
 # Configures Elixir's Logger
 config :logger, :console,

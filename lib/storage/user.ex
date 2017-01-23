@@ -1,7 +1,18 @@
 defmodule Storage.User do
-  @type t :: Storage.Database.User.t
+  use Storage.Model
 
-  defstruct %Storage.Database.User{}
-    |> Map.from_struct
-    |> Map.keys
+  schema "users" do
+    field :email,           :string
+    field :name,            :string
+    field :password_hash,   :string
+    field :google_account,  :string
+
+    timestamps(type: :utc_datetime)
+  end
+
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:email, :name, :password_hash, :google_account])
+    |> validate_required([:email])
+  end
 end

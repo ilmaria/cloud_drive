@@ -10,7 +10,7 @@ defmodule CloudDrive.Router do
   end
 
   pipeline :authenticate do
-
+    plug Auth.Authenticate
   end
 
   scope "/", CloudDrive do
