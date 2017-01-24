@@ -1,5 +1,4 @@
 defmodule Storage.GoogleDrive do
-  alias Storage.File
   require Logger
 
   @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
@@ -9,45 +8,51 @@ defmodule Storage.GoogleDrive do
   @client_id @google_oauth[:client_id]
   @client_secret @google_oauth[:client_secret]
 
-  @doc"""
-  Get all files from Google Drive and sync their info to Cloud Drive
-  database.
-  """
-  def sync_google_drive(user, token) do
+  #Get all files from Google Drive and sync their info to Cloud Drive database.
+  def sync(user, token) do
     files = get_files(token)
     folders = get_folders(token)
 
-    Enum.each files, fn file ->
-      tags = get_tags(file, folders)
+    Enum.each files, fn google_file ->
+      parents = google_file["parents"] || []
 
-      Database.create_or_update_file(file, user, tags)
+      file = google_file
+      |> to_storage_file(user)
+      |> add_tags(folders, parents)
+
+      case Storage.Repo.get_by(Storage.File, Map.to_list(file.data)) do
+        nil -> file
+        existing_file -> existing_file
+      end
+      |> Storage.Repo.insert_or_update
     end
   end
 
-  # Get tags for Google Drive files by using parent folders as tag names.
-  defp get_tags(file, folders) do
-    parents = file.parents || []
+  # Add tags to file by using Google Drive parent folders as tag names.
+  defp add_tags(file, folders, parents \\ []) do
+    tags =
+      Enum.map(parents, fn parent_id ->
+        parent = Enum.find folders, fn folder ->
+          folder.id == parent_id
+        end
 
-    Enum.map(parents, fn parent_id ->
-      parent = Enum.find folders, fn folder ->
-        folder.id == parent_id
-      end
+        if !parent do
+          Logger.debug "Nil parent: #{inspect(parents)}"
+          nil
+        else
+          name = parent["name"]
+          case Storage.Repo.get_by(Tag, name: name) do
+            nil -> Storage.Repo.insert!(%Storage.Tag{name: name})
+            tag -> tag
+          end
+        end
+      end) |> Enum.reject(&is_nil/1)
 
-      if !parent do
-        Logger.info "Nil parent: #{inspect(parents)}"
-        nil
-      else
-        tag = Database.get_or_create_tag(parent.name)
-        tag.id
-      end
-    end)
-    |> Enum.reject(&is_nil/1)
+    Storage.File.changeset(file, tags: tags)
   end
 
-  @doc"""
-  Get a list of all Google Drive files.
-  """
-  def get_files(token) do
+  #Get a list of all Google Drive files.
+  defp get_files(token) do
     params = [
       q: "mimeType != 'application/vnd.google-apps.folder' and trashed = false",
       fields: "files(createdTime,mimeType,modifiedTime,name," <>
@@ -56,18 +61,14 @@ defmodule Storage.GoogleDrive do
       pageSize: 1000
     ]
 
-    case get_drive_file_list(token, params, GoogleDrive.File) do
+    case get_file_list(token, params) do
       {:ok, file_list} -> file_list
-      error ->
-        Logger.error inspect(error)
-        []
+      error -> []
     end
   end
 
-  @doc"""
-  Get a list of all Google Drive folders.
-  """
-  def get_folders(token) do
+  #Get a list of all Google Drive folders.
+  defp get_folders(token) do
     params = [
       q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false",
       fields: "files(id,name),nextPageToken",
@@ -75,57 +76,61 @@ defmodule Storage.GoogleDrive do
       pageSize: 1000
     ]
 
-    case get_drive_file_list(token, params, GoogleDrive.Folder) do
+    case get_file_list(token, params) do
       {:ok, folder_list} -> folder_list
-      error ->
-        Logger.error inspect(error)
-        []
+      error -> []
     end
   end
 
 
   # Use Google Drive `files.list` api to get a list of files or folders.
-  defp get_drive_file_list(token, params, struct_module) do
-    response = HTTPoison.get @api_endpoint <> "/files",
-      [{"Content-Type", "application/json"},
-       {"Authorization", "Bearer #{token}"}],
-      params: params
+  defp get_file_list(token, params) do
+    url = @api_endpoint <> "/files"
+    headers = [{"Content-Type", "application/json"},
+               {"Authorization", "Bearer #{token}"}]
 
-    case response do
-      {:ok, resp} ->
-        #TODO: check if response code is ok before doing anything
-        resp_body = Poison.decode! resp.body
-        next_token = Map.get(resp_body, "nextPageToken")
-        files = Enum.map resp_body["files"], fn file_map ->
-          Poison.Decode.decode file_map, as: struct!(struct_module)
+    with {:ok, resp} <- HTTPoison.get(url, headers, params: params),
+         {:ok, files, next_token} <- parse_files(resp.body) do
+
+      if next_token do
+        updated_params = Keyword.put(params, :pageToken, next_token)
+        next_page = get_file_list(token, updated_params)
+
+        additional_files = case next_page do
+          {:ok, list} -> list
+          _ -> []
         end
 
-        if !next_token do
-          {:ok, files}
-        else
-          updated_params = Keyword.put(params, :pageToken, next_token)
-          next_page = get_drive_file_list(token, updated_params, struct_module)
-          additional_files = case next_page do
-            {:ok, list} -> list
-            _ -> []
-          end
-          {:ok, additional_files ++ files}
-        end
+        {:ok, additional_files ++ files}
+      else
+        {:ok, files}
+      end
 
+    else
       error ->
+        Logger.error inspect(error, pretty: true)
         error
     end
   end
 
+  defp parse_files(json_body) do
+    data = Poison.decode! json_body
+
+    {:ok, data["files"], Map.get(data, "nextPageToken")}
+  end
+
+  # Transform Google Drive file into Storage.File.
   defp to_storage_file(google_file, user) do
     file_params = %{
       owner: user,
-      name: google_file.name,
-      mime_type: google_file.mimeType,
-      edit_url: google_file.webViewLink
-      size: google_file.size,
+      name: google_file["name"],
+      mime_type: google_file["mimeType"],
+      edit_url: google_file["webViewLink"],
+      #TODO: fix download url
+      download_url: "",
+      size: google_file["size"],
       google_file?: true
     }
-    File.changeset(%File{}, file_params)
+    Storage.File.changeset(%Storage.File{}, file_params)
   end
 end

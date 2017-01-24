@@ -1,5 +1,5 @@
 defmodule Storage.Model do
-  defmacro __using__() do
+  defmacro __using__(_opts) do
     quote do
       use Ecto.Schema
 

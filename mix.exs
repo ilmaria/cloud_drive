@@ -35,8 +35,8 @@ defmodule CloudDrive.Mixfile do
      {:cowboy,              "~> 1.0"},
      {:ecto,                "~> 2.1"},
      {:ecto_mnesia,         "~> 0.7.1"},
-     {:guardian,            "~> 0.14"},
      {:ueberauth,           "~> 0.4"},
-     {:ueberauth_google,    "~> 0.5"}]
+     {:ueberauth_google,    "~> 0.5"},
+     {:poison,              "~> 2.2"}]
   end
 end

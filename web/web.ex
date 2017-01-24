@@ -25,10 +25,6 @@ defmodule CloudDrive.Web do
   def controller do
     quote do
       use Phoenix.Controller
-      use Guardian.Phoenix.Controller
-
-      alias Guardian.Plug.EnsureAuthenticated
-      alias Guardian.Plug.EnsurePermissions
 
       import CloudDrive.Router.Helpers
       import CloudDrive.Gettext

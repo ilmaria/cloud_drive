@@ -1,8 +1,6 @@
 defmodule CloudDrive.Endpoint do
   use Phoenix.Endpoint, otp_app: :cloud_drive
 
-  socket "/socket", CloudDrive.UserSocket
-
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phoenix.digest

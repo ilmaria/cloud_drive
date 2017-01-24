@@ -1,10 +1,13 @@
 defmodule CloudDrive.AuthController do
   use CloudDrive.Web, :controller
-  alias Storage.User
-  alias Storage.Repo
+  alias Ueberauth.Strategy.Helpers
   require Logger
 
   plug Ueberauth
+
+  def request(conn, _params) do
+    redirect(conn, to: Ueberauth.Strategy.Helpers.request_url(conn))
+  end
 
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params) do
     conn
@@ -13,12 +16,13 @@ defmodule CloudDrive.AuthController do
   end
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    user = Repo.get_by!(User, email: auth.info.email)
+    user = Storage.Repo.get_by!(Storage.User, email: auth.info.email)
 
     Logger.debug inspect(auth, pretty: true)
 
     conn
     |> put_session(:user, user)
+    |> put_session(:google_token, auth.credentials.token)
     |> redirect(to: "/")
   end
 

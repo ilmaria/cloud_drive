@@ -28,9 +28,9 @@
         <%= for file <- Enum.take @files, 4 do %>
           <tr id='<%= "recent-file-id-#{file.id}" %>'>
             <td><%= file.name %>
-            <td><a href="<%= file.url %>">Open</a>
-            <td><%= compact_size(file.size) %>
-            <td><%= last_modified_time(file) %>
+            <td><a href="<%= file.edit_url %>">Open</a>
+            <td><%= file.size %>
+            <td><%= file.updated_at %>
         <% end %>
     </table>
   </section>
@@ -50,9 +50,9 @@
         <%= for file <- @files do %>
           <tr id='<%= "file-id-#{file.id}" %>'>
             <td><%= file.name %>
-            <td><a href="<%= file.url %>">Open</a>
-            <td><%= compact_size(file.size) %>
-            <td><%= last_modified_time(file) %>
+            <td><a href="<%= file.edit_url %>">Open</a>
+            <td><%= file.size %>
+            <td><%= file.updated_at %>
         <% end %>
     </table>
   </section>

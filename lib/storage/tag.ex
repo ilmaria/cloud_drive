@@ -12,5 +12,6 @@ defmodule Storage.Tag do
     struct
     |> cast(params, [:name, :color])
     |> validate_required([:name])
+    |> unique_constraint(:name)
   end
 end

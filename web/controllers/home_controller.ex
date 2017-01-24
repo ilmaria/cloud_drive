@@ -3,8 +3,16 @@ defmodule CloudDrive.HomeController do
 
   def index(conn, _params) do
     user = conn |> get_session(:user)
+    token = conn |> get_session(:google_token)
 
-    render conn, "index.html", user: user
+    files = if user do
+      Storage.sync_with_google(user, token)
+      user.files
+    else
+      []
+    end
+
+    render conn, "index.html", user: user, files: files
   end
 
 end
