@@ -13,8 +13,8 @@ defmodule CloudDrive.Router do
     pipe_through [:browser, :authenticate]
 
     get "/", HomeController, :index
-    get "/google/callback", HomeController, :auth_callback
-    post "/logout", HomeController, :logout
+    get "/google/callback", AuthController, :callback
+    post "/logout", AuthController, :logout
   end
 
   scope "/login" CloudDrive do

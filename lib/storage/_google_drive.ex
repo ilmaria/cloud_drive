@@ -1,5 +1,5 @@
 defmodule Storage.GoogleDrive do
-  alias Storage.File
+  use Database
   require Logger
 
   @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
@@ -115,17 +115,5 @@ defmodule Storage.GoogleDrive do
       error ->
         error
     end
-  end
-
-  defp to_storage_file(google_file, user) do
-    file_params = %{
-      owner: user,
-      name: google_file.name,
-      mime_type: google_file.mimeType,
-      edit_url: google_file.webViewLink
-      size: google_file.size,
-      google_file?: true
-    }
-    File.changeset(%File{}, file_params)
   end
 end
