@@ -23,7 +23,7 @@ defmodule CloudDrive.Mixfile do
   defp deps do
     [{:plug, "~> 1.2"},
      {:remix, "~> 0.0.2", runtime: false},
-     {:amnesia, "~> 0.2.5"},
+     {:eternal, "~> 1.1"},
      {:hashids, "~> 2.0"},
      {:sizeable, "~> 0.1.5"},
      {:timex, "~> 3.1"},
