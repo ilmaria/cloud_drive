@@ -15,7 +15,8 @@ defmodule CloudDrive.Views.Auth do
 
           Logger.info "Assign token to session"
           Logger.info auth.credentials.token
-          #Logger.info inspect(auth, pretty: true)
+          Logger.debug "--- auth ---"
+          Logger.info inspect(auth, pretty: true)
           conn
           |> put_session(:user, user)
           |> put_session(:google_api_token, auth.credentials.token)
