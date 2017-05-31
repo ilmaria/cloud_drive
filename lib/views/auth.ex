@@ -1,6 +1,6 @@
 defmodule CloudDrive.Views.Auth do
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
+  alias CloudDrive.Storage
   require Logger
 
   # Google will redirect to this route when user has logged in with a Google
@@ -9,14 +9,14 @@ defmodule CloudDrive.Views.Auth do
     conn =
       case conn.assigns do
         %{ueberauth_auth: auth} ->
-          user = Database.get(User, email: auth.info.email)
+          user = Storage.get(:users, auth.info.email)
 
           Logger.info "User: #{user.email} has logged in."
 
-          Logger.info "Assign token to session"
-          Logger.info auth.credentials.token
+          Logger.debug "Assign token to session"
+          Logger.debug auth.credentials.token
           Logger.debug "--- auth ---"
-          Logger.info inspect(auth, pretty: true)
+          Logger.debug inspect(auth, pretty: true)
           conn
           |> put_session(:user, user)
           |> put_session(:google_api_token, auth.credentials.token)

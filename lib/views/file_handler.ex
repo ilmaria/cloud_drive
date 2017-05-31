@@ -1,6 +1,6 @@
 defmodule CloudDrive.Views.FileHandler do
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
+  alias CloudDrive.Storage
   require Logger
 
   get "/add" do
@@ -14,7 +14,7 @@ defmodule CloudDrive.Views.FileHandler do
     user = conn |> get_session(:user)
 
     Enum.map files, fn file ->
-      cloud_file = Database.save(CloudFile, file, [user: user])
+      cloud_file = Storage.File.from(file, user.email)
 
       Logger.info """
       File upload
@@ -28,14 +28,14 @@ defmodule CloudDrive.Views.FileHandler do
   end
 
   post "/remove" do
-    fileIds = conn.params["fileIds"]
+    file_ids = conn.params["fileIds"]
 
-    Enum.map fileIds, fn fileId ->
-      Database.remove(CloudFile, fileId)
+    Enum.map file_ids, fn file_id ->
+      Storage.delete(:files, file_id)
 
       Logger.info """
       File removed
-      File id: #{fileId}\
+      File id: #{file_id}\
       """
     end
 

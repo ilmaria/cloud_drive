@@ -1,4 +1,4 @@
-defmodule CloudDrive.Storage.Tag do
+defmodule CloudDrive.Storage.User do
     @type t :: %__MODULE__{
         email:                String.t,
         password_hash:        String.t,

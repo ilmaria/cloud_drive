@@ -20,7 +20,7 @@ defmodule CloudDrive.GoogleDrive do
         Enum.each files, fn file_info ->
             tags = get_tags(file_info, folders)
 
-            Storage.File.from(file_info, user, tags)
+            Storage.File.from(file_info, user.email, tags)
                 |> Strorage.insert()
         end
     end

@@ -1,6 +1,6 @@
 defmodule CloudDrive.Views.Home do
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
+  alias CloudDrive.Storage
   import CloudDrive.GoogleDrive
   require Logger
 
@@ -11,13 +11,14 @@ defmodule CloudDrive.Views.Home do
     if user do
       if !user.gdrive_synced do
         sync_google_drive(user, token)
-        Database.save(User, %{user | gdrive_synced: true})
+        Storage.insert(:users, %{user | gdrive_synced: true}, [id: user.email])
       end
 
-      files = Database.where CloudFile,
-        owner_id == user.id
+      # Match user's email to file owner
+      files = Storage.select(:files,
+        {:'_', %Storage.File{owner_email: ^user.email}})
 
-      tags = Database.all(Tag)
+      tags = Storage.all(:tags)
       template = render_template(files: files, tags: tags, user: user)
 
       conn |> send_resp(:ok, template)
