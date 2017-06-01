@@ -1,6 +1,6 @@
 defmodule CloudDrive.Views.SharedFiles do
   use CloudDrive.View
-  alias CloudDrive.Storage
+  use CloudDrive.Database, as: Database
   alias CloudDrive.Hashids, as: H
 
   require Logger
@@ -11,8 +11,9 @@ defmodule CloudDrive.Views.SharedFiles do
   get "/:hash/:file_name" do
     {:ok, [file_id]} = H.decode(hash)
 
-    file = Storage.match(:files,
-      {:'_', %Storage.File{id: ^file_id, name: ^file_name}})
+    file = Database.get CloudFile,
+      id: file_id,
+      name: file_name
 
     Logger.info "file_id: #{file_id}"
     Logger.info "file: #{inspect file}"
