@@ -1,7 +1,8 @@
 defmodule CloudDrive.Views.Home do
+  use Amnesia
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
-  import CloudDrive.GoogleDrive
+  use CloudDrive.Database
+  alias CloudDrive.GoogleDrive
   require Logger
 
   get "/" do
@@ -9,15 +10,24 @@ defmodule CloudDrive.Views.Home do
     token = conn |> get_session(:google_api_token)
 
     if user do
-      if !user.gdrive_synced do
-        sync_google_drive(user, token)
-        Database.save(User, %{user | gdrive_synced: true})
+      if !user.google_synced do
+        GoogleDrive.sync_google_drive(user, token)
+
+        Amnesia.transaction do
+          User.write(%{user | google_synced: true})
+        end
       end
 
-      files = Database.where CloudFile,
-        owner_id == user.id
+      files = Amnesia.transaction do
+        CloudFile.match(owner_id: user.id) |> Amnesia.Selection.values()
+      end
 
-      tags = Database.all(Tag)
+      tags = Amnesia.transaction do
+        Tag.stream
+      end
+
+      Logger.debug inspect (Enum.take files, 5)
+
       template = render_template(files: files, tags: tags, user: user)
 
       conn |> send_resp(:ok, template)

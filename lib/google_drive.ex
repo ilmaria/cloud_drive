@@ -1,155 +1,145 @@
 defmodule CloudDrive.GoogleDrive do
-  use CloudDrive.Database, as: Database
-  alias CloudDrive.GoogleDrive
-  require Logger
+    use Amnesia
+    use CloudDrive.Database
+    require Logger
 
-  @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
-  @account_endpoint "https://accounts.google.com/o/oauth2/v2/auth"
-  @api_endpoint "https://www.googleapis.com/drive/v3"
-  @google_oauth Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)
-  @client_id @google_oauth[:client_id]
-  @client_secret @google_oauth[:client_secret]
+    @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
+    @account_endpoint "https://accounts.google.com/o/oauth2/v2/auth"
+    @api_endpoint "https://www.googleapis.com/drive/v3"
+    @google_oauth Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)
+    @client_id @google_oauth[:client_id]
+    @client_secret @google_oauth[:client_secret]
 
-  @doc"""
-  Get all files from Google Drive and sync their info to Cloud Drive
-  database.
-  """
-  def sync_google_drive(user, token) do
-    files = get_files(token)
-    folders = get_folders(token)
+    # Get all files from Google Drive and sync their info to Cloud Drive
+    # database.
+    @spec sync_google_drive(User.t, String.t) :: none
+    def sync_google_drive(user, token) do
+        files = get_files(token)
+        folders = get_folders(token)
 
-    Enum.each files, fn file ->
-      tags = get_tags(file, folders)
+        Enum.each files, fn file ->
+            tags = create_tags(user, file, folders)
 
-      Database.create_or_update_file(file, user, tags)
+            Amnesia.transaction do
+                CloudFile.from(file, user, tags) |> CloudFile.write()
+            end
+        end
     end
-  end
 
-  # Get tags for Google Drive files by using parent folders as tag names.
-  defp get_tags(file, folders) do
-    parents = file.parents || []
+    # Create tags for Google Drive files with parent folders as tag names.
+    @spec create_tags(User.t, map, [map]) :: [Tag.t]
+    defp create_tags(user, file, folders) do
+        parents = file["parents"] || []
 
-    Enum.map(parents, fn parent_id ->
-      parent = Enum.find folders, fn folder ->
-        folder.id == parent_id
-      end
+        Enum.map(parents, fn parent_id ->
+            parent = Enum.find folders, fn folder ->
+                folder["id"] == parent_id
+            end
 
-      if !parent do
-        Logger.info "Nil parent: #{inspect(parents)}"
-        nil
-      else
-        tag = Database.get_or_create_tag(parent.name)
-        tag.id
-      end
-    end)
-    |> Enum.reject(&is_nil/1)
-  end
+            if !parent do
+                Logger.debug "Nil parent: #{inspect parents}"
+                nil
+            else
+                Amnesia.transaction do
+                    match = Tag.match(user_id: user.id, name: parent["name"])
 
-  @doc"""
-  Get a list of all Google Drive files.
-  """
-  def get_files(token) do
-    params = [
-      q: "mimeType != 'application/vnd.google-apps.folder' and trashed = false",
-      fields: "files(createdTime,mimeType,modifiedTime,name," <>
-        "parents,size,webViewLink),nextPageToken",
-      spaces: "drive",
-      pageSize: 1000
-    ]
-
-    case get_drive_file_list(token, params, GoogleDrive.File) do
-      {:ok, file_list} -> file_list
-      error ->
-        Logger.error inspect(error)
-        []
+                    if match do
+                        Amnesia.Selection.values(match)
+                    else
+                        Tag.new(user, parent["name"]) |> Tag.write()
+                    end
+                end
+            end
+        end) |> Enum.reject(&is_nil/1)
     end
-  end
 
-  @doc"""
-  Get a list of all Google Drive folders.
-  """
-  def get_folders(token) do
-    params = [
-      q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false",
-      fields: "files(id,name),nextPageToken",
-      spaces: "drive",
-      pageSize: 1000
-    ]
+    # Get a list of all Google Drive files.
+    @spec get_files(String.t) :: [map]
+    def get_files(token) do
+        params = [
+            q: "mimeType != 'application/vnd.google-apps.folder' and trashed = false",
+            fields: "files(id,createdTime,mimeType,modifiedTime,name,parents,size,webViewLink),nextPageToken",
+            spaces: "drive",
+            pageSize: 1000
+        ]
 
-    case get_drive_file_list(token, params, GoogleDrive.Folder) do
-      {:ok, folder_list} -> folder_list
-      error ->
-        Logger.error inspect(error)
-        []
+        case get_drive_file_list(token, params) do
+            {:ok, file_list} -> file_list
+            error ->
+                Logger.error inspect(error)
+                []
+        end
     end
-  end
+
+    # Get a list of all Google Drive folders.
+    @spec get_folders(String.t) :: [map]
+    def get_folders(token) do
+        params = [
+            q: "mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+            fields: "files(id,name),nextPageToken",
+            spaces: "drive",
+            pageSize: 1000
+        ]
+
+        case get_drive_file_list(token, params) do
+            {:ok, folder_list} -> folder_list
+            error ->
+                Logger.error inspect(error)
+                []
+        end
+    end
 
 
-  # Use Google Drive `files.list` api to get a list of files or folders.
-  defp get_drive_file_list(token, params, struct_module) do
-    response = HTTPoison.get @api_endpoint <> "/files",
-      [{"Content-Type", "application/json"},
-       {"Authorization", "Bearer #{token}"}],
-      params: params
+    # Use Google Drive `files.list` api to get a list of files or folders.
+    @spec get_drive_file_list(String.t, keyword) :: {:ok, [map]}
+        | {:error, HTTPoison.Error.t | Poison.ParseError.t}
+    defp get_drive_file_list(token, params) do
+        response = HTTPoison.get @api_endpoint <> "/files",
+            [{"Content-Type", "application/json"},
+            {"Authorization", "Bearer #{token}"}],
+            params: params
 
-    case response do
-      {:ok, resp} ->
         #TODO: check if response code is ok before doing anything
-        resp_body = Poison.decode! resp.body
-        next_token = Map.get(resp_body, "nextPageToken")
-        files = Enum.map resp_body["files"], fn file_map ->
-          Poison.Decode.decode file_map, as: struct!(struct_module)
-        end
+        with {:ok, resp} <- response,
+             {:ok, body} <- Poison.decode(resp.body)
+        do
+            page_token = body["nextPageToken"]
 
-        if !next_token do
-          {:ok, files}
+            if page_token do
+                updated_params = Keyword.put(params, :pageToken, page_token)
+                next_page = get_drive_file_list(token, updated_params)
+
+                case next_page do
+                    {:ok, additional_files} -> {:ok, additional_files ++ body["files"]}
+                    _ -> {:ok, []}
+                end
+            else
+                {:ok, body["files"]}
+            end
         else
-          updated_params = Keyword.put(params, :pageToken, next_token)
-          next_page = get_drive_file_list(token, updated_params, struct_module)
-          additional_files = case next_page do
-            {:ok, list} -> list
-            _ -> []
-          end
-          {:ok, additional_files ++ files}
+            error -> error
         end
-
-      error ->
-        error
     end
-  end
 
-  @doc"""
-  Refresh Google Drive token. Throw on error.
-  """
-  def new_access_token!(refresh_token) do
-    case new_access_token(refresh_token) do
-      {:ok, resp} -> resp
-      {:error, reason} -> throw reason
+    # Refresh Google Drive token.
+    @spec new_access_token(String.t) :: {:ok, String.t}
+        | {:error, HTTPoison.Error.t | Poison.ParseError.t}
+    def new_access_token(refresh_token) do
+        response = HTTPoison.post @token_endpoint,
+            [{"Content-Type", "application/x-www-form-urlencoded"}],
+            params: [
+                client_id: @client_id,
+                client_secret: @client_secret,
+                refresh_token: refresh_token,
+                grant_type: "refresh_token"
+            ]
+
+        with {:ok, resp} <- response,
+             {:ok, body} <- Poison.decode(resp.body)
+        do
+            {:ok, body["access_token"]}
+        else
+            error -> error
+        end
     end
-  end
-
-  @doc"""
-  Refresh Google Drive token.
-  """
-  def new_access_token(refresh_token) do
-    response = HTTPoison.post @token_endpoint,
-      [{"Content-Type", "application/x-www-form-urlencoded"}],
-      params: [
-        client_id: @client_id,
-        client_secret: @client_secret,
-        refresh_token: refresh_token,
-        grant_type: "refresh_token"
-      ]
-
-    case response do
-      {:ok, resp} ->
-        new_token = resp.body
-        |> Poison.decode!
-        |> Map.take(["access_token", "expires_at"])
-
-        {:ok, new_token}
-      _ ->
-        response
-    end
-  end
 end

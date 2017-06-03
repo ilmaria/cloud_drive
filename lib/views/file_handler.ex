@@ -1,6 +1,7 @@
 defmodule CloudDrive.Views.FileHandler do
+  use Amnesia
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
+  use CloudDrive.Database
   require Logger
 
   get "/add" do
@@ -13,8 +14,10 @@ defmodule CloudDrive.Views.FileHandler do
     files = conn.params["files"]
     user = conn |> get_session(:user)
 
-    Enum.map files, fn file ->
-      cloud_file = Database.save(CloudFile, file, [user: user])
+    Enum.each files, fn file ->
+      cloud_file = Amnesia.transaction do
+        CloudFile.from(file, user) |> CloudFile.write_to_disk()
+      end
 
       Logger.info """
       File upload
@@ -28,14 +31,16 @@ defmodule CloudDrive.Views.FileHandler do
   end
 
   post "/remove" do
-    fileIds = conn.params["fileIds"]
+    file_ids = conn.params["fileIds"]
 
-    Enum.map fileIds, fn fileId ->
-      Database.remove(CloudFile, fileId)
+    Enum.map file_ids, fn file_id ->
+      Amnesia.transaction do
+        CloudFile.delete_from_disk(file_id)
+      end
 
       Logger.info """
       File removed
-      File id: #{fileId}\
+      File id: #{file_id}\
       """
     end
 

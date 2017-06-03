@@ -23,7 +23,7 @@
 
   <nav>
     <%= if @user do %>
-      <span>You are signed in as <%= @user.name %></span> |
+      <span>You are signed in as <%= @user.email %></span> |
       <form action="/auth/logout" method="post" class="inline-block">
         <button class="link-btn">Logout</button>
       </form>
@@ -59,14 +59,14 @@
         <thead>
           <tr>
             <th>Name
-            <th>Link
+            <th>View Link
             <th>File size
             <th>Last modified
         <tbody>
           <%= for file <- Enum.take @files, 4 do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><a href="<%= file.url %>">Open</a>
+              <td><a href="<%= file.view_url %>">Open</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
@@ -81,14 +81,14 @@
         <thead>
           <tr>
             <th>Name
-            <th>Link
+            <th>View Link
             <th>File size
             <th>Last modified
         <tbody>
           <%= for file <- @files do %>
             <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
-              <td><a href="<%= file.url %>">Open</a>
+              <td><a href="<%= file.view_url %>">Open</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>

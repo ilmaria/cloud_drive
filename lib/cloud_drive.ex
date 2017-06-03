@@ -1,12 +1,11 @@
 defmodule CloudDrive do
     use Application
-    use CloudDrive.Database, as: Database
+    use Amnesia
+    use CloudDrive.Database
     require Logger
 
     @server Application.get_env(:cloud_drive, :server)
 
-    # See http://elixir-lang.org/docs/stable/elixir/Application.html
-    # for more information on OTP Applications
     def start(_type, _args) do
         import Supervisor.Spec, warn: false
 
@@ -14,7 +13,6 @@ defmodule CloudDrive do
         port = @server[:port]
 
         children = [
-            # Define workers and child supervisors to be supervised
             Plug.Adapters.Cowboy.child_spec(scheme, CloudDrive.Router, [], [port: port])
         ]
 
@@ -25,22 +23,22 @@ defmodule CloudDrive do
             Logger.info "Starting local server at #{scheme}://localhost:#{port}"
         end)
 
-        # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-        # for other strategies and supported options
         opts = [strategy: :one_for_one, name: CloudDrive.Supervisor]
         Supervisor.start_link(children, opts)
     end
 
     def init_db() do
         Amnesia.stop()
-        Amnesia.Schema.create()
+        Logger.debug "Create schema: " <> inspect Amnesia.Schema.create()
         Amnesia.start()
 
-        CloudDrive.Database.Tables.create(disk: [node()])
-        CloudDrive.Database.Tables.wait()
+        Logger.debug "Create database: " <> inspect CloudDrive.Database.create(disk: [node()])
+        CloudDrive.Database.wait()
 
-        if !Database.get(User, email: "ilmari.autio@gmail.com") do
-            Database.save(User, %User{email: "ilmari.autio@gmail.com", name: "Ilmari"})
+        Amnesia.transaction do
+            if User.match(email: "ilmari.autio@gmail.com") == nil do
+                %User{email: "ilmari.autio@gmail.com"} |> User.write()
+            end
         end
     end
 end

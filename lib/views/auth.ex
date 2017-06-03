@@ -1,6 +1,7 @@
 defmodule CloudDrive.Views.Auth do
+  use Amnesia
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
+  use CloudDrive.Database
   require Logger
 
   # Google will redirect to this route when user has logged in with a Google
@@ -9,7 +10,9 @@ defmodule CloudDrive.Views.Auth do
     conn =
       case conn.assigns do
         %{ueberauth_auth: auth} ->
-          user = Database.get(User, email: auth.info.email)
+          [user] = Amnesia.transaction do
+            User.match(email: auth.info.email) |> Amnesia.Selection.values()
+          end
 
           Logger.info "User: #{user.email} has logged in."
 

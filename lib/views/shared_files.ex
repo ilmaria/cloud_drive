@@ -1,26 +1,24 @@
 defmodule CloudDrive.Views.SharedFiles do
   use CloudDrive.View
-  use CloudDrive.Database, as: Database
-  alias CloudDrive.Hashids, as: H
+  use Amnesia
+  use CloudDrive.Database
 
   require Logger
 
   @app_settings Application.get_env(:cloud_drive, :settings)
   @shared_folder @app_settings[:shared_files_folder]
 
-  get "/:hash/:file_name" do
-    {:ok, [file_id]} = H.decode(hash)
-
-    file = Database.get CloudFile,
-      id: file_id,
-      name: file_name
+  get "/:file_id/:file_name" do
+    file = Amnesia.transaction do
+      CloudFile.read(file_id)
+    end
 
     Logger.info "file_id: #{file_id}"
     Logger.info "file: #{inspect file}"
 
     if file do
       Logger.info "yes"
-      conn |> send_file(200, @shared_folder <> hash)
+      conn |> send_file(200, @shared_folder <> file_id)
     else
       Logger.info "no"
       conn |> send_resp(:not_found, "Not found")
