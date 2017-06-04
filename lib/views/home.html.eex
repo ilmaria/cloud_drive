@@ -67,7 +67,13 @@
         <tbody>
           <%= for file <- section.files do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
-              <td><%= file.name %>
+              <td>
+                <div><%= file.name %></div>
+                <div>
+                  <%= for tag <- file.tags do %>
+                    <span style="background-color: <%= tag.color %>"><%= tag.name %></span>
+                  <% end %>
+                </div>
               <td><a href="<%= file.view_url %>">Open</a>
               <td><a href="<%= file.download_url %>">Download</a>
               <td><%= compact_size(file.size) %>
