@@ -16,7 +16,7 @@ defmodule CloudDrive.Views.FileHandler do
 
     Enum.each files, fn file ->
       cloud_file = Amnesia.transaction do
-        CloudFile.from(file, user) |> CloudFile.write_to_disk()
+        CloudFile.from(file, user) |> CloudFile.write_to_disk(file.path)
       end
 
       Logger.info """

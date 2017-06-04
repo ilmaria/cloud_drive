@@ -6,8 +6,6 @@ require Logger
 
 defdatabase CloudDrive.Database do
 
-    @app_settings Application.get_env(:cloud_drive, :settings)
-
     deftable Tag, [:user_id, :name, :color], type: :bag do
         @type t :: %__MODULE__{
             user_id:    non_neg_integer,
@@ -49,6 +47,8 @@ defdatabase CloudDrive.Database do
             view_url:       String.t,
             size:           non_neg_integer,
         }
+
+        @app_settings Application.get_env(:cloud_drive, :settings)
 
         def from(file, user, tags \\ [])
 
@@ -99,15 +99,15 @@ defdatabase CloudDrive.Database do
             }
         end
 
-        @spec write_to_disk(t) :: none
-        def write_to_disk(file) do
+        @spec write_to_disk(t, Path.t) :: none
+        def write_to_disk(file, from_path) do
             shared_url = @app_settings[:shared_url]
             shared_folder = @app_settings[:shared_files_folder]
 
             File.mkdir(shared_folder)
-            File.cp(file.path, shared_folder <> file.id)
+            File.cp(from_path, shared_folder <> file.id)
 
-            %{file | download_url: "/#{shared_url}/#{file.id}/#{file.filename}"}
+            %{file | download_url: "/#{shared_url}/#{file.id}/#{file.name}"}
                 |> __MODULE__.write
         end
 

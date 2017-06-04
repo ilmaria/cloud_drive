@@ -60,6 +60,7 @@
           <tr>
             <th>Name
             <th>View Link
+            <th>Download
             <th>File size
             <th>Last modified
         <tbody>
@@ -67,6 +68,7 @@
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td><%= file.name %>
               <td><a href="<%= file.view_url %>">Open</a>
+              <td><a href="<%= file.download_url %>">Download</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
@@ -82,6 +84,7 @@
           <tr>
             <th>Name
             <th>View Link
+            <th>Download
             <th>File size
             <th>Last modified
         <tbody>
@@ -89,6 +92,7 @@
             <tr id='<%= "file-id-#{file.id}" %>'>
               <td><%= file.name %>
               <td><a href="<%= file.view_url %>">Open</a>
+              <td><a href="<%= file.download_url %>">Download</a>
               <td><%= compact_size(file.size) %>
               <td><%= last_modified_time(file) %>
           <% end %>
