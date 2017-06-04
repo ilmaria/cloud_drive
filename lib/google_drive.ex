@@ -44,7 +44,7 @@ defmodule CloudDrive.GoogleDrive do
                     match = Tag.match(user_id: user.id, name: parent["name"])
 
                     if match do
-                        Amnesia.Selection.values(match)
+                        Amnesia.Selection.values(match) |> hd()
                     else
                         Tag.new(user, parent["name"]) |> Tag.write()
                     end

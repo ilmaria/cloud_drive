@@ -1,54 +1,46 @@
 defmodule CloudDrive.Router do
-  use Plug.Router
-  use CloudDrive.Database
-  use Amnesia
-  alias CloudDrive.Views
-  require Logger
+    use Plug.Router
+    alias CloudDrive.Views
+    require Logger
 
-  if Mix.env == :dev do
-    use Plug.Debugger, otp_app: :cloud_drive
-  end
+    if Mix.env == :dev do
+        use Plug.Debugger, otp_app: :cloud_drive
+    end
 
-  ## Plugs ##
-  plug Plug.Logger
+    @secrets Application.get_env(:cloud_drive, :secret)
 
-  plug Plug.Static,
-    at: "/static",
-    from: "./web"
+    plug Plug.Logger
+    plug Plug.Static,
+        at: "/static",
+        from: "./web"
+    plug Plug.Parsers,
+        parsers: [:multipart, :json],
+        pass: ["*/*"],
+        json_decoder: Poison
+    plug :put_secret_key_base
+    plug Plug.Session,
+        store: :cookie,
+        key: "_cloud_drive_session",
+        encryption_salt: "cookie store encryption salt",
+        signing_salt: "cookie store signing salt",
+        key_length: 64,
+        log: :debug
+    plug :fetch_session
+    plug Ueberauth
+    plug :match
+    plug :dispatch
 
-  plug Plug.Parsers,
-    parsers: [:multipart, :json],
-    pass: ["*/*"],
-    json_decoder: Poison
+    forward "/file", to: Views.FileHandler
+    forward "/auth", to: Views.Auth
+    forward "/shared", to: Views.SharedFiles
+    forward "/", to: Views.Home
 
-  plug :put_secret_key_base
+    match _ do
+        conn |> send_resp(:not_found, "Not found")
+    end
 
-  plug Plug.Session,
-    store: :cookie,
-    key: "_cloud_drive_session",
-    encryption_salt: "cookie store encryption salt",
-    signing_salt: "cookie store signing salt",
-    key_length: 64,
-    log: :debug
-
-  plug :fetch_session
-  plug Ueberauth
-  plug :match
-  plug :dispatch
-
-  ## Routes ##
-  forward "/file", to: Views.FileHandler
-
-  forward "/auth", to: Views.Auth
-
-  forward "/shared", to: Views.SharedFiles
-
-  forward "/", to: Views.Home
-
-  @secret Application.get_env(:cloud_drive, :secret)
-
-  def put_secret_key_base(conn, _opts) do
-    put_in conn.secret_key_base, @secret[:secret_key_base]
-  end
+    def put_secret_key_base(conn, _opts) do
+        put_in conn.secret_key_base, @secrets[:secret_key_base]
+    end
 
 end
