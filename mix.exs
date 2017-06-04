@@ -10,7 +10,6 @@ defmodule CloudDrive.Mixfile do
         deps: deps()]
     end
 
-    # Configuration for the OTP application
     def application do
         [extra_applications: apps(Mix.env),
         mod: {CloudDrive.Application, []}]
@@ -19,7 +18,6 @@ defmodule CloudDrive.Mixfile do
     defp apps(:prod), do: [:logger]
     defp apps(_env), do: [:logger, :remix]
 
-    # Dependencies
     defp deps do
         [{:plug, "~> 1.2"},
         {:remix, "~> 0.0.2", runtime: false},
