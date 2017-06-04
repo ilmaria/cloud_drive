@@ -1,44 +1,45 @@
 defmodule CloudDrive.Views.Auth do
-  use Amnesia
-  use CloudDrive.View
-  use CloudDrive.Database
-  require Logger
+    use Amnesia
+    use CloudDrive.View
+    use CloudDrive.Database
+    require Logger
 
-  # Google will redirect to this route when user has logged in with a Google
-  # account.
-  get "/google/callback" do
-    conn =
-      case conn.assigns do
-        %{ueberauth_auth: auth} ->
-          [user] = Amnesia.transaction do
-            User.match(email: auth.info.email) |> Amnesia.Selection.values()
-          end
+    # Google will redirect to this route when user has logged in with a Google
+    # account.
+    get "/google/callback" do
+        conn =
+            case conn.assigns do
+                %{ueberauth_auth: auth} ->
+                    [user] = Amnesia.transaction do
+                        User.match(email: auth.info.email)
+                            |> Amnesia.Selection.values()
+                    end
 
-          Logger.info "User: #{user.email} has logged in."
+                    Logger.info "User: #{user.email} has logged in."
 
-          Logger.debug "Assign token to session"
-          Logger.debug auth.credentials.token
-          Logger.debug "--- auth ---"
-          Logger.debug inspect(auth, pretty: true)
-          conn
-          |> put_session(:user, user)
-          |> put_session(:google_api_token, auth.credentials.token)
-        _ ->
-          Logger.info "Login failed:"
-          Logger.info inspect(conn.assigns, pretty: true)
-          conn
-      end
+                    Logger.debug "Assign token to session"
+                    Logger.debug auth.credentials.token
+                    Logger.debug "--- auth ---"
+                    Logger.debug inspect(auth, pretty: true)
 
-    conn |> redirect("/")
-  end
+                    conn
+                        |> put_session(:user, user)
+                        |> put_session(:google_api_token, auth.credentials.token)
+                _ ->
+                    Logger.info "Login failed: " <> inspect(conn.assigns, pretty: true)
+                    conn
+            end
 
-  post "/logout" do
-    conn
-    |> configure_session(drop: true)
-    |> redirect("/")
-  end
+        conn |> redirect("/")
+    end
 
-  match _ do
-    conn |> send_resp(:not_found, "Not found")
-  end
+    post "/logout" do
+        conn
+            |> configure_session(drop: true)
+            |> redirect("/")
+    end
+
+    match _ do
+        conn |> send_resp(:not_found, "Not found")
+    end
 end
