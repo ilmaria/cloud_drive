@@ -13,7 +13,7 @@ defmodule CloudDrive.Mixfile do
     # Configuration for the OTP application
     def application do
         [extra_applications: apps(Mix.env),
-        mod: {CloudDrive, []}]
+        mod: {CloudDrive.Application, []}]
     end
 
     defp apps(:prod), do: [:logger]

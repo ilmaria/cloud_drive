@@ -29,13 +29,13 @@ defmodule CloudDrive.Views.Auth do
           conn
       end
 
-    conn |> redirect(to: "/")
+    conn |> redirect("/")
   end
 
   post "/logout" do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: "/")
+    |> redirect("/")
   end
 
   match _ do

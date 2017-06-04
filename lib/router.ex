@@ -35,10 +35,6 @@ defmodule CloudDrive.Router do
     forward "/shared", to: Views.SharedFiles
     forward "/", to: Views.Home
 
-    match _ do
-        conn |> send_resp(:not_found, "Not found")
-    end
-
     def put_secret_key_base(conn, _opts) do
         put_in conn.secret_key_base, @secrets[:secret_key_base]
     end

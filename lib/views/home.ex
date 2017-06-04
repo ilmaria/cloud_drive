@@ -26,8 +26,6 @@ defmodule CloudDrive.Views.Home do
         Tag.stream
       end
 
-      Logger.debug inspect (Enum.take files, 5)
-
       template = render_template(files: files, tags: tags, user: user)
 
       conn |> send_resp(:ok, template)

@@ -3,13 +3,22 @@ defmodule CloudDrive.View do
   defmacro __using__(_opts) do
     quote do
       use Plug.Router
-      use CloudDrive.Template
+      require EEx
 
       plug :match
       plug :dispatch
 
-      defp redirect(conn, opts) do
-        url = opts[:to]
+      view = Module.split(__MODULE__)
+          |> List.last()
+          |> Macro.underscore()
+
+      path = __DIR__ |> Path.join("#{view}.html.eex")
+
+      if File.exists? path do
+          EEx.function_from_file(:defp, :render_template, path, [:assigns])
+      end
+
+      defp redirect(conn, url) do
         body = """
         <!DOCTYPE html>
         You are being <a href="#{url}>redirected</a>.

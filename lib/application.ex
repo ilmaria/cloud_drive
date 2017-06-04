@@ -1,4 +1,4 @@
-defmodule CloudDrive do
+defmodule CloudDrive.Application do
     use Application
     use Amnesia
     use CloudDrive.Database

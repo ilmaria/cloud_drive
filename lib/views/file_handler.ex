@@ -27,7 +27,7 @@ defmodule CloudDrive.Views.FileHandler do
       """
     end
 
-    conn |> redirect(to: "/")
+    conn |> redirect("/")
   end
 
   post "/remove" do
@@ -44,7 +44,7 @@ defmodule CloudDrive.Views.FileHandler do
       """
     end
 
-    conn |> redirect(to: "/")
+    conn |> redirect("/")
   end
 
   match _ do
