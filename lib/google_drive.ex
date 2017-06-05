@@ -120,26 +120,4 @@ defmodule CloudDrive.GoogleDrive do
             error -> error
         end
     end
-
-    # Refresh Google Drive token.
-    @spec new_access_token(String.t) :: {:ok, String.t}
-        | {:error, HTTPoison.Error.t | Poison.ParseError.t}
-    def new_access_token(refresh_token) do
-        response = HTTPoison.post @token_endpoint,
-            [{"Content-Type", "application/x-www-form-urlencoded"}],
-            params: [
-                client_id: @client_id,
-                client_secret: @client_secret,
-                refresh_token: refresh_token,
-                grant_type: "refresh_token"
-            ]
-
-        with {:ok, resp} <- response,
-             {:ok, body} <- Poison.decode(resp.body)
-        do
-            {:ok, body["access_token"]}
-        else
-            error -> error
-        end
-    end
 end

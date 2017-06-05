@@ -23,7 +23,7 @@ defmodule CloudDrive.Views.Home do
             end
 
             tags = Amnesia.transaction do
-                Tag.stream
+                Tag.stream()
             end
 
             template = render_template(files: files, tags: tags, user: user)
