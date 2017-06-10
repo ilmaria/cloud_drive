@@ -10,21 +10,22 @@ defmodule CloudDrive.Views.Auth do
         conn =
             case conn.assigns do
                 %{ueberauth_auth: auth} ->
-                    [user] = Amnesia.transaction do
-                        User.match(email: auth.info.email)
+                    user = Amnesia.transaction do
+                        [user] = User.match(email: auth.info.email)
                             |> Amnesia.Selection.values()
+
+                        %{user | refresh_token: auth.credentials.refresh_token}
+                            |> User.write()
                     end
 
                     Logger.info "User: #{user.email} has logged in."
 
-                    Logger.debug "Assign token to session"
-                    Logger.debug auth.credentials.token
                     Logger.debug "--- auth ---"
                     Logger.debug inspect(auth, pretty: true)
 
                     conn
                         |> put_session(:user, user)
-                        |> put_session(:google_api_token, auth.credentials.token)
+                        |> put_session(:credentials, auth.credentials)
                 _ ->
                     Logger.info "Login failed: " <> inspect(conn.assigns, pretty: true)
                     conn

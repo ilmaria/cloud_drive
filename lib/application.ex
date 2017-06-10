@@ -12,11 +12,12 @@ defmodule CloudDrive.Application do
         scheme = @server[:scheme]
         port = @server[:port]
 
-        children = [
-            Plug.Adapters.Cowboy.child_spec(scheme, CloudDrive.Router, [], [port: port])
-        ]
-
         init_db()
+
+        children = [
+            Plug.Adapters.Cowboy.child_spec(scheme, CloudDrive.Router, [], [port: port]),
+            worker(CloudDrive.GoogleSyncServer, []),
+        ]
 
         Task.start(fn ->
             Process.sleep(500)

@@ -7,11 +7,11 @@ defmodule CloudDrive.Views.Home do
 
     get "/" do
         user = conn |> get_session(:user)
-        token = conn |> get_session(:google_api_token)
+        credentials = conn |> get_session(:credentials)
 
         if user do
             if !user.google_synced do
-                GoogleDrive.sync_google_drive(user, token)
+                GoogleDrive.sync_google_drive(user, credentials.token)
 
                 Amnesia.transaction do
                     User.write(%{user | google_synced: true})
@@ -23,7 +23,7 @@ defmodule CloudDrive.Views.Home do
             end
 
             tags = Amnesia.transaction do
-                Tag.stream()
+                Enum.to_list(Tag.stream)
             end
 
             template = render_template(files: files, tags: tags, user: user)

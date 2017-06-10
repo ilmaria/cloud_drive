@@ -3,12 +3,7 @@ defmodule CloudDrive.GoogleDrive do
     use CloudDrive.Database
     require Logger
 
-    @token_endpoint "https://www.googleapis.com/oauth2/v4/token"
-    @account_endpoint "https://accounts.google.com/o/oauth2/v2/auth"
     @api_endpoint "https://www.googleapis.com/drive/v3"
-    @google_oauth Application.get_env(:ueberauth, Ueberauth.Strategy.Google.OAuth)
-    @client_id @google_oauth[:client_id]
-    @client_secret @google_oauth[:client_secret]
 
     # Get all files from Google Drive and sync their info to Cloud Drive
     # database.
@@ -95,7 +90,7 @@ defmodule CloudDrive.GoogleDrive do
         | {:error, HTTPoison.Error.t | Poison.ParseError.t}
     defp get_drive_file_list(token, params) do
         response = HTTPoison.get @api_endpoint <> "/files",
-            [{"Content-Type", "application/json"},
+            [{"Accept", "application/json"},
             {"Authorization", "Bearer #{token}"}],
             params: params
 
