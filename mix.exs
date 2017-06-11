@@ -11,16 +11,13 @@ defmodule CloudDrive.Mixfile do
     end
 
     def application do
-        [extra_applications: apps(Mix.env),
+        [extra_applications: [:logger, :eex],
         mod: {CloudDrive.Application, []}]
     end
 
-    defp apps(:prod), do: [:logger]
-    defp apps(_env), do: [:logger, :remix]
-
     defp deps do
         [{:plug, "~> 1.2"},
-        {:remix, "~> 0.0.2", runtime: false},
+        {:remix, "~> 0.0.2", only: :dev},
         {:amnesia, "~> 0.2.5"},
         {:hashids, "~> 2.0"},
         {:sizeable, "~> 0.1.5"},
@@ -29,6 +26,7 @@ defmodule CloudDrive.Mixfile do
         {:ueberauth, "~> 0.4"},
         {:ueberauth_google, "~> 0.4"},
         {:httpoison, "~> 0.10.0"},
-        {:cowboy, "~> 1.0"}]
+        {:cowboy, "~> 1.0"},
+        {:distillery, "~> 1.4", runtime: false}]
     end
 end
