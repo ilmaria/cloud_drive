@@ -61,7 +61,7 @@ defmodule CloudDrive.GoogleDrive do
         case get_drive_file_list(token, params) do
             {:ok, file_list} -> file_list
             error ->
-                Logger.error inspect(error)
+                Logger.error "Token: #{token} #{inspect(error)}"
                 []
         end
     end
@@ -79,7 +79,7 @@ defmodule CloudDrive.GoogleDrive do
         case get_drive_file_list(token, params) do
             {:ok, folder_list} -> folder_list
             error ->
-                Logger.error inspect(error)
+                Logger.error "Token: #{token} #{inspect(error)}"
                 []
         end
     end
@@ -95,8 +95,11 @@ defmodule CloudDrive.GoogleDrive do
             params: params
 
         #TODO: check if response code is ok before doing anything
-        with {:ok, resp} <- response,
-             {:ok, body} <- Poison.decode(resp.body)
+        with {:ok, %HTTPoison.Response{
+                        status_code: status,
+                        body: body
+                    } } when 200 <= status <= 299 <- response,
+             {:ok, body} <- Poison.decode(body)
         do
             page_token = body["nextPageToken"]
 
@@ -112,6 +115,9 @@ defmodule CloudDrive.GoogleDrive do
                 {:ok, body["files"]}
             end
         else
+            {:ok, %HTTPoison.Response{status_code: status}} ->
+                reason = Plug.Conn.Status.reason_phrase(status)
+                {:error, "#{reason} - #{status}"}
             error -> error
         end
     end

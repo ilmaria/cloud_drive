@@ -10,12 +10,16 @@ defmodule CloudDrive.Views.Home do
         credentials = conn |> get_session(:credentials)
 
         if user do
-            if !user.google_synced do
+            conn = if !user.google_synced do
                 GoogleDrive.sync_google_drive(user, credentials.token)
 
-                Amnesia.transaction do
+                synced_user = Amnesia.transaction do
                     User.write(%{user | google_synced: true})
                 end
+
+                conn |> put_session(:user, synced_user)
+            else
+                conn
             end
 
             files = Amnesia.transaction do
