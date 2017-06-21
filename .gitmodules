@@ -1,3 +1,0 @@
-[submodule "ci-server"]
-	path = ci-server
-	url = https://github.com/ilmaria/ci-server
