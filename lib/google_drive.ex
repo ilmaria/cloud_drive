@@ -115,8 +115,9 @@ defmodule CloudDrive.GoogleDrive do
                 {:ok, body["files"]}
             end
         else
-            {:ok, %HTTPoison.Response{status_code: status}} ->
+            {:ok, %HTTPoison.Response{status_code: status}} = err ->
                 reason = Plug.Conn.Status.reason_phrase(status)
+                Logger.debug inspect Poison.decode!(err.body)
                 {:error, "#{reason} - #{status}"}
             error -> error
         end

@@ -16,6 +16,9 @@ defmodule CloudDrive.Views.Auth do
 
                         %{user | refresh_token: auth.credentials.refresh_token}
                             |> User.write()
+
+                        %{user | access_token: auth.credentials.token}
+                            |> User.write()
                     end
 
                     Logger.info "User: #{user.email} has logged in."
@@ -25,7 +28,6 @@ defmodule CloudDrive.Views.Auth do
 
                     conn
                         |> put_session(:user, user)
-                        |> put_session(:credentials, auth.credentials)
                 _ ->
                     Logger.info "Login failed: " <> inspect(conn.assigns, pretty: true)
                     conn

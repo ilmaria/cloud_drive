@@ -7,11 +7,10 @@ defmodule CloudDrive.Views.Home do
 
     get "/" do
         user = conn |> get_session(:user)
-        credentials = conn |> get_session(:credentials)
 
         if user do
             conn = if !user.google_synced do
-                GoogleDrive.sync_google_drive(user, credentials.token)
+                GoogleDrive.sync_google_drive(user, user.access_token)
 
                 synced_user = Amnesia.transaction do
                     User.write(%{user | google_synced: true})

@@ -1,6 +1,6 @@
-defmodule CloudDrive.GoogleSyncServer do
+defmodule CloudDrive.GoogleSync do
     use Amnesia
-    use GenServer
+    use Task, restart: :permanent # Restart task always when it stops
     use CloudDrive.Database
     require Logger
 
@@ -9,56 +9,54 @@ defmodule CloudDrive.GoogleSyncServer do
     @client_id @google_oauth[:client_id]
     @client_secret @google_oauth[:client_secret]
 
-
-    # Client
-
     def start_link(name \\ __MODULE__) do
-        GenServer.start_link(__MODULE__, :ok, [name: name])
+        Task.start_link(__MODULE__, :loop, [])
     end
 
-
-    # Server (callbacks)
-
-    defmodule Token do
-        @type t :: %__MODULE__{
-            user: User.t,
-            access_token: String.t,
-            expires_in: non_neg_integer,
-        }
-
-        defstruct [:user, :access_token, :expires_in]
-    end
-
-    def init(_args) do
+    # Check users' token expiration and get a new access_token if it's
+    # is about to expire
+    def loop() do
         users = Amnesia.transaction do
-            Enum.to_list(User.stream)
+            User.stream
+                |> Enum.to_list()
+                |> Enum.filter(fn user -> user.refresh_token end)
         end
 
-        state = Enum.filter(users, fn user -> user.google_synced end)
-            |> Enum.map(fn user ->
+        Enum.each(users, fn user ->
+            if user.expires_in < 10 do
                 {access_token, expires_in} =
                     case new_access_token(user.refresh_token) do
-                        {:ok, %{"access_token" => access_token, "expires_in" => expires_in}} ->
+                        {:ok, %{"access_token" => access_token,
+                                "expires_in" => expires_in}} ->
                             {access_token, expires_in}
                         error ->
-                            Logger.debug inspect error
+                            Logger.error inspect error
                             {"", 0}
                     end
+                Amnesia.transaction do
+                   %{user |
+                        access_token: access_token,
+                        token_expiration: expires_in
+                    } |> User.write()
+                end
+            else
+                Amnesia.transaction do
+                    %{user |
+                        token_expiration: user.token_expiration - 5
+                    } |> User.write()
+                end
+            end
+        end)
 
-                %Token{
-                    user: user,
-                    access_token: access_token,
-                    expires_in: expires_in,
-                }
-            end)
+        Process.sleep(5000)
 
-        Logger.debug "tokens: " <> inspect state
+        Logger.debug "Updated user tokens: " <> inspect users
 
-        {:ok, state}
+        loop()
     end
 
     # Refresh Google Drive token.
-    @spec new_access_token(String.t) :: {:ok, String.t}
+    @spec new_access_token(String.t) :: {:ok, Map.t}
         | {:error, HTTPoison.Error.t | Poison.ParseError.t}
     defp new_access_token(refresh_token) do
         response = HTTPoison.post @token_endpoint,

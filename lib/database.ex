@@ -23,13 +23,15 @@ defdatabase CloudDrive.Database do
     end
 
     deftable User, [{:id, autoincrement}, :email, :password_hash,
-                    :google_synced, :refresh_token] do
+                    :google_synced, :refresh_token, :access_token, :token_expiration] do
         @type t :: %__MODULE__{
-            id:             non_neg_integer,
-            email:          String.t,
-            password_hash:  String.t,
-            google_synced:  boolean,
-            refresh_token:  String.t,
+            id:               non_neg_integer,
+            email:            String.t,
+            password_hash:    String.t,
+            google_synced:    boolean,
+            refresh_token:    String.t,
+            access_token:     String.t,
+            token_expiration: non_neg_integer,
         }
     end
 

@@ -16,7 +16,7 @@ defmodule CloudDrive.Application do
 
         children = [
             Plug.Adapters.Cowboy.child_spec(scheme, CloudDrive.Router, [], [port: port]),
-            worker(CloudDrive.GoogleSyncServer, []),
+            CloudDrive.GoogleSync,
         ]
 
         Task.start(fn ->
