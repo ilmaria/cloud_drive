@@ -14,11 +14,10 @@ defmodule CloudDrive.Views.Auth do
                         [user] = User.match(email: auth.info.email)
                             |> Amnesia.Selection.values()
 
-                        %{user | refresh_token: auth.credentials.refresh_token}
-                            |> User.write()
-
-                        %{user | access_token: auth.credentials.token}
-                            |> User.write()
+                        %{user |
+                            refresh_token: auth.credentials.refresh_token,
+                            access_token: auth.credentials.token
+                        } |> User.write()
                     end
 
                     Logger.info "User: #{user.email} has logged in."

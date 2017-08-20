@@ -9,7 +9,7 @@ defmodule CloudDrive.GoogleSync do
     @client_id @google_oauth[:client_id]
     @client_secret @google_oauth[:client_secret]
 
-    def start_link(name \\ __MODULE__) do
+    def start_link(_args) do
         Task.start_link(__MODULE__, :loop, [])
     end
 
@@ -23,7 +23,7 @@ defmodule CloudDrive.GoogleSync do
         end
 
         Enum.each(users, fn user ->
-            if user.expires_in < 10 do
+            if !user.token_expiration || user.token_expiration < 10 do
                 {access_token, expires_in} =
                     case new_access_token(user.refresh_token) do
                         {:ok, %{"access_token" => access_token,
@@ -49,8 +49,6 @@ defmodule CloudDrive.GoogleSync do
         end)
 
         Process.sleep(5000)
-
-        Logger.debug "Updated user tokens: " <> inspect users
 
         loop()
     end

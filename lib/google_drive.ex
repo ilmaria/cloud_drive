@@ -19,6 +19,14 @@ defmodule CloudDrive.GoogleDrive do
                 CloudFile.from(file, user, tags) |> CloudFile.write()
             end
         end
+
+        if files != [] do
+            Amnesia.transaction do
+                User.write(%{user | google_synced: true})
+            end
+        else
+            user
+        end
     end
 
     # Create tags for Google Drive files with parent folders as tag names.
@@ -98,7 +106,7 @@ defmodule CloudDrive.GoogleDrive do
         with {:ok, %HTTPoison.Response{
                         status_code: status,
                         body: body
-                    } } when 200 <= status <= 299 <- response,
+                    } } when 200 <= status and status <= 299 <- response,
              {:ok, body} <- Poison.decode(body)
         do
             page_token = body["nextPageToken"]
@@ -115,9 +123,9 @@ defmodule CloudDrive.GoogleDrive do
                 {:ok, body["files"]}
             end
         else
-            {:ok, %HTTPoison.Response{status_code: status}} = err ->
+            {:ok, %HTTPoison.Response{status_code: status}} ->
                 reason = Plug.Conn.Status.reason_phrase(status)
-                Logger.debug inspect Poison.decode!(err.body)
+                Logger.debug "err"
                 {:error, "#{reason} - #{status}"}
             error -> error
         end
