@@ -14,7 +14,6 @@ defmodule CloudDrive.Views.Home do
             else
                 user
             end
-            conn |> put_session(:user, user)
 
             files = Amnesia.transaction do
                 CloudFile.match(owner_id: user.id) |> Amnesia.Selection.values()
@@ -26,7 +25,9 @@ defmodule CloudDrive.Views.Home do
 
             template = render_template(files: files, tags: tags, user: user)
 
-            conn |> send_resp(:ok, template)
+            conn 
+                |> put_session(:user, user)
+                |> send_resp(:ok, template)
         else
             template = render_template(files: [])
 

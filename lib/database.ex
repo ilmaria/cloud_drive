@@ -13,11 +13,11 @@ defdatabase CloudDrive.Database do
             color:      String.t,
         }
 
-        def new(user, name) do
+        def new(user, name, color) do
             %__MODULE__{
                 user_id: user.id,
                 name: name,
-                color: "#555555",
+                color: color,
             }
         end
     end
