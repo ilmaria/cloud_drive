@@ -25,7 +25,7 @@ defmodule CloudDrive.Views.Home do
 
             template = render_template(files: files, tags: tags, user: user)
 
-            conn 
+            conn
                 |> put_session(:user, user)
                 |> send_resp(:ok, template)
         else

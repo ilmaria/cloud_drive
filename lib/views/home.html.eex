@@ -68,10 +68,10 @@
           <%= for file <- section.files do %>
             <tr id='<%= "recent-file-id-#{file.id}" %>'>
               <td>
-                <div><%= file.name %></div>
+                <div><%= Plug.HTML.html_escape_to_iodata(file.name) %></div>
                 <div>
                   <%= for tag <- file.tags do %>
-                    <span style="background-color: <%= tag.color %>"><%= tag.name %></span>
+                    <span style="background-color: <%= tag.color %>"><%= Plug.HTML.html_escape_to_iodata(tag.name) %></span>
                   <% end %>
                 </div>
               <td><a href="<%= file.view_url %>">Open</a>

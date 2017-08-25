@@ -27,6 +27,7 @@ defmodule CloudDrive.Mixfile do
         {:ueberauth_google, "~> 0.4"},
         {:httpoison, "~> 0.10.0"},
         {:cowboy, "~> 1.0"},
-        {:distillery, "~> 1.4", runtime: false}]
+        {:distillery, "~> 1.4", runtime: false},
+        {:webassembly, "~> 0.6"}]
     end
 end
