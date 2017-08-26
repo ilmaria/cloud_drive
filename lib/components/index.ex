@@ -1,5 +1,7 @@
 defmodule CloudDrive.Components.Index do
   use WebAssembly
+  alias CloudDrive.Components
+  alias CloudDrive.Database.CloudFile
 
   def render(user, files) do
     builder do
@@ -24,18 +26,22 @@ defmodule CloudDrive.Components.Index do
           main [class: "flex flex-column items-center"] do
             h1 "Cloud Drive"
 
-            CloudDrive.Components.Nav.render(user)
-            CloudDrive.Components.SearchBar.render()
+            Components.Nav.render(user)
+            Components.SearchBar.render()
 
             div [class: "m3 self-stretch"] do
-              recent_files = Enum.take(files, 4)
+              recent_files = files
+                |> Enum.sort_by(&CloudFile.last_modified_time/1, &>/2)
+                |> Enum.take(4)
+
               section [id: :recent_files] do
                 h2 "Recent Files"
-                CloudDrive.Components.FileTable.render(recent_files)
+                Components.FileTable.render(recent_files)
               end
+
               section [id: :all_files] do
                 h2 "All Files"
-                CloudDrive.Components.FileTable.render(files)
+                Components.FileTable.render(files)
               end
             end
           end
