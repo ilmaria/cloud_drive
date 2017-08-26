@@ -35,7 +35,7 @@ defmodule CloudDrive.GoogleDrive do
     end
 
     # Create tags for Google Drive files with parent folders as tag names.
-    @spec create_tags(User.t, map, [map], string) :: [Tag.t]
+    @spec create_tags(User.t, map, [map], String.t) :: [Tag.t]
     defp create_tags(user, file, folders, color) do
         parents = file["parents"] || []
 

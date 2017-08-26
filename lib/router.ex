@@ -12,7 +12,7 @@ defmodule CloudDrive.Router do
     plug Plug.Logger
     plug Plug.Static,
         at: "/static",
-        from: "./web"
+        from: {:cloud_drive, "priv/static"}
     plug Plug.Parsers,
         parsers: [:multipart, :json],
         pass: ["*/*"],

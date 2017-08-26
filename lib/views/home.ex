@@ -2,7 +2,7 @@ defmodule CloudDrive.Views.Home do
     use Amnesia
     use CloudDrive.View
     use CloudDrive.Database
-    alias CloudDrive.GoogleDrive
+    alias CloudDrive.{GoogleDrive, Components}
     require Logger
 
     get "/" do
@@ -23,30 +23,16 @@ defmodule CloudDrive.Views.Home do
                 Enum.to_list(Tag.stream)
             end
 
-            template = render_template(files: files, tags: tags, user: user)
+            template =  Components.Index.render(user, files)
 
             conn
                 |> put_session(:user, user)
                 |> send_resp(:ok, template)
         else
-            template = render_template(files: [])
+            template = Components.Index.render(nil, [])
 
             conn |> send_resp(:ok, template)
         end
-    end
-
-    def last_modified_time(file) do
-        case file.modified_time |> Timex.format("{YYYY}-{0M}-{0D}") do
-            {:ok, time} -> time
-            {:error, reason} ->
-                Logger.error inspect(reason, pretty: true)
-                "-"
-        end
-    end
-
-    def compact_size(nil), do: "-"
-    def compact_size(file_size) do
-        Sizeable.filesize(file_size, %{round: 1})
     end
 
     match _ do

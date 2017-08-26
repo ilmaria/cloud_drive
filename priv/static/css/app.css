@@ -34,9 +34,9 @@ td {
   background-color: #eaeaea;
 }
 
-input[type='search'] {
-  /* width: 35rem; */
-  height: 2.5rem;
+#main-search {
+  width: 35rem;
+  height: 2rem;
   font-size: 1.4rem;
 }
 

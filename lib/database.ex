@@ -120,5 +120,21 @@ defdatabase CloudDrive.Database do
 
             __MODULE__.delete(file_id)
         end
+
+        @spec last_modified_time(t) :: String.t
+        def last_modified_time(file) do
+            case file.modified_time |> Timex.format("{YYYY}-{0M}-{0D}") do
+                {:ok, time} -> time
+                {:error, reason} ->
+                    Logger.error inspect(reason, pretty: true)
+                    "-"
+            end
+        end
+
+        @spec compact_size(non_neg_integer) :: String.t
+        def compact_size(nil), do: "-"
+        def compact_size(file_size) do
+            Sizeable.filesize(file_size, %{round: 1})
+        end
     end
 end
