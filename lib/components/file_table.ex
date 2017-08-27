@@ -20,7 +20,7 @@ defmodule CloudDrive.Components.FileTable do
               div Plug.HTML.html_escape_to_iodata(file.name)
               div do
                 for tag <- file.tags do
-                  span [style: "background-color: #{tag.color}"],
+                  span [class: "tag", style: "background-color: #{tag.color}"],
                   Plug.HTML.html_escape_to_iodata(tag.name)
                 end
               end
