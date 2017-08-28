@@ -14,6 +14,7 @@ defmodule CloudDrive.Components.Index do
           title "CloudDrive"
 
           # Styles
+          link [href: "https://fonts.googleapis.com/css?family=Zilla+Slab", rel: "stylesheet"]
           link [href: "/static/css/basscss.css", rel: "stylesheet"]
           link [href: "/static/css/app.css", rel: "stylesheet"]
 

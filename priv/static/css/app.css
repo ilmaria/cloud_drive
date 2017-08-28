@@ -1,13 +1,13 @@
 body {
-  font-family: sans-serif;
+  font-family: 'Zilla Slab', serif;
   margin: 0;
   font-size: 18px; /*1em = 18px*/
-  background-color: #292929;
+  /* background-color: #292929; */
   /* background-image: url(/static/images/blackboard.jpg);
   background-size: cover;
   background-attachment: fixed;
   background-position: center; */
-  color: #cc984a;
+  /* color: #cc984a; */
 }
 
 ul {
