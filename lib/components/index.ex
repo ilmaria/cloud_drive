@@ -11,10 +11,12 @@ defmodule CloudDrive.Components.Index do
           meta [name: "viewport", content: "width=device-width, initial-scale=1"]
           meta [name: "description", content: "My cloud drive"]
           meta [name: "author", content: "Ilmari Autio"]
-          meta [property: "og:title", content: "Cloud Time"]
+          
+          meta [property: "og:title", content: "Cloud Drive"]
           meta [property: "og:type", content: "website"]
-          meta [property: "og:image", content: "https://hookrace.net/time.gif"]
-          meta [property: "og:title", content: "https://cloud.autio.me"]
+          meta [property: "og:image", content: ""]
+          meta [property: "og:url", content: "https://cloud.autio.me"]
+
           title "CloudDrive"
 
           # Styles
