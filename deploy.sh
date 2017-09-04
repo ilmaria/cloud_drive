@@ -14,6 +14,4 @@ kill $(lsof -i tcp:8000 -t) &>/dev/null
 
 # Start server in daemon mode
 _build/prod/rel/cloud_drive/bin/cloud_drive start
-
-logout
 '
